@@ -1,75 +1,26 @@
-# Nuxt Minimal Starter
+# Felix Thomas - Dev Portfolio
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Personal portfolio and project showcase.
 
-## Setup
+## Tech Stack (Work in Progress)
 
-Make sure to install dependencies:
+- **Framework:** Nuxt 4 (Vue 3)
+- **Styling:** Tailwind CSS
+- **Animations:** GSAP 3
+
+## Project Status
+
+This project is currently under development.
+
+**Planned Features:**
+- Interactive resume
+- Password-protected project showcase
+
+## Local Development
 
 ```bash
-# npm
+# install dependencies
 npm install
 
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
+# start dev server at http://localhost:3000
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
