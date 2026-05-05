@@ -1,0 +1,3 @@
+[submodule "public/showcase"]
+	path = server/showcase
+	url = https://github.com/Signifikant-zz/showcase-assets.git
