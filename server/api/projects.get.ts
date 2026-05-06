@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 export default defineEventHandler(async (event) => {
-  const baseDir = path.resolve('server/showcase')
+  const baseDir = path.resolve(process.cwd(), 'server/showcase')
   if (!fs.existsSync(baseDir)) return []
 
   // 1. Nur die echten PROJEKT-Ordner auf der obersten Ebene lesen
@@ -35,10 +35,10 @@ export default defineEventHandler(async (event) => {
         const isWallpaper = lowerName.includes('wallpaper')
         const isSitebar = lowerName.includes('ds') || lowerName.includes('sitebar')
 
-        let width = null
-        let height = null
+        let width: number | null = null
+        let height: number | null = null
         const sizeMatch = formatName.match(/(\d+)x(\d+)/)
-        if (sizeMatch) {
+        if (sizeMatch && sizeMatch[1] && sizeMatch[2]) {
           width = parseInt(sizeMatch[1])
           height = parseInt(sizeMatch[2])
         }

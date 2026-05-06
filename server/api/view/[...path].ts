@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const filePath = event.context.params?.path
   if (!filePath) throw createError({ statusCode: 400 })
 
-  const fullPath = path.resolve('server/showcase', filePath)
+  const fullPath = path.resolve(process.cwd(), 'server/showcase', filePath)
 
   if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
     const ext = path.extname(fullPath).toLowerCase()
