@@ -25,16 +25,25 @@
     </template>
 
     <div>
-      <section id="hero" class="min-h-screen flex items-center bg-white">
+      <section id="hero" class="relative min-h-screen flex items-center bg-white overflow-hidden w-full">
         <canvas id="hero-canvas" class="absolute inset-0 z-0 block"></canvas>
 
-        <div class="max-w-6xl mx-auto px-6 z-10 w-full select-none">
+        <div class="max-w-6xl mx-auto px-6 z-10 w-full select-none pointer-events-none">
           <h1 class="text-6xl md:text-8xl font-bold text-slate-900 mb-4 tracking-tighter leading-none">
             FRONTEND/<br />FULLSTACK<br />DEVELOPER<span class="text-blue-500">.</span>
           </h1>
-          <p class="text-xl text-slate-400 max-w-2xl">
+          <p class="text-xl text-slate-400 max-w-2xl pointer-events-auto">
             Spezialisiert auf High-End Banner-Animationen (GSAP) und moderne Web-Applikationen.
           </p>
+        </div>
+
+        <div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 flex gap-6">
+          <button v-for="(config, modeName) in modeConfigs" :key="modeName"
+                  @click="switchMode(modeName)" class="group relative p-2">
+            <span class="block w-3 h-3 rounded-full border-2 border-slate-900 transition-all duration-500"
+                  :class="currentMode === modeName ? 'bg-slate-900 scale-125' : 'bg-transparent opacity-30 group-hover:opacity-100'">
+            </span>
+          </button>
         </div>
       </section>
 
@@ -189,252 +198,250 @@
 </template>
 
 <script setup>
-
-import { onMounted, ref }     from 'vue'
-import { gsap }               from 'gsap'
-import { ScrollToPlugin }     from 'gsap/ScrollToPlugin'
-import { ScrollTrigger }      from 'gsap/ScrollTrigger'
+import { onMounted, ref } from 'vue'
+import { gsap } from 'gsap'
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollToPlugin, ScrollTrigger)
 
-const activeSection           = ref('hero')
+// --- 1. SEITEN-LOGIK (Navigation & Showcase) ---
+const activeSection = ref('hero')
+const isLoggedIn = ref(false)
 
-const isLoggedIn              = ref(false)
-
-const campaigns               = ref([
+const campaigns = ref([
   {
     title: '2506_DasTelefonbuch',
     client: 'DasTelefonbuch',
-    description: '',
-    thumbnail: '/api/view/2506_DasTelefonbuch_300x250/fb.jpg',
     formats: [
-      {
-        name: 'Medium Rectangle',
-        width: 300,
-        height: 250,
-        url: '/api/view/2506_DasTelefonbuch_300x250/index.html',
-        type: 'static'
-      },
-      {
-        name: 'Halfpage',
-        width: 300,
-        height: 600,
-        url: '/api/view/2506_DasTelefonbuch_300x600/index.html',
-        type: 'static'
-      },
-      {
-        name: 'Billboard',
-        width: 800,
-        height: 250,
-        url: '/api/view/2506_DasTelefonbuch_800x250/index.html',
-        type: 'static'
-      }
+      { name: 'Medium Rectangle', width: 300, height: 250, url: '/api/view/2506_DasTelefonbuch_300x250/index.html' },
+      { name: 'Halfpage', width: 300, height: 600, url: '/api/view/2506_DasTelefonbuch_300x600/index.html' }
     ]
   },
   {
     title: '2510_Lotto',
     client: 'Lotto',
-    description: '',
-    thumbnail: '/api/view/2510_Lotto_300x960_DS_auto/fb.jpg',
-    formats: [
-      {
-        name: 'Dynamic Sidebar (responsiv)',
-        url: '/api/view/2510_Lotto_300x960_DS_auto/index.html',
-        type: 'dynamic'
-      },
-    ]
-  },
-  {
-    title: '2207_Michelin',
-    client: 'Michelin',
-    description: '',
-    thumbnail: '',
-    formats: [
-      {
-        name: 'Fireplace (120x600 + 1280x90 + 120x600)',
-        url: '/api/view/2207_michelin_fireplace_120x600_1280x90_120x600/test.html',
-        type: 'external'
-      },
-    ]
-  },
+    formats: [{ name: 'Dynamic Sidebar', url: '/api/view/2510_Lotto_300x960_DS_auto/index.html' }]
+  }
 ])
 
-const activeCampaign          = ref(null)
-const activeFormat            = ref(null)
+const activeCampaign = ref(null)
+const activeFormat = ref(null)
 
 const openCampaign = (campaign) => {
   activeCampaign.value = campaign
   activeFormat.value = campaign.formats[0]
 }
 
-onMounted(() => {
-  const observerOptions = {
-    root: null,
-    threshold: 0.5,
-    rootMargin: "-10% 0px -40% 0px"
-  }
+const scrollToSection = (id) => {
+  gsap.to(window, { duration: 1.2, scrollTo: { y: id, offsetY: 64 }, ease: "power4.out" })
+}
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        activeSection.value = entry.target.id
-      }
-    })
-  }, observerOptions)
+// --- 2. ENGINE-LOGIK (Variablen & Configs) ---
+const currentMode = ref('classic')
+let particles = []
+let canvas, ctx, width, height
+const mouse = { x: -1000, y: -1000 }
 
-  document.querySelectorAll('section[id]').forEach((section) => {
-    observer.observe(section)
-  })
+const params = ref({
+  time: 0, hue: 217, saturation: 10, lightness: 50,
+  repelRadius: 150, isAttracting: false,
+  trailAlpha: 0.08, speedMult: 1, sizeScale: 1
+})
 
-  // HERO ANI
-  const canvas = document.getElementById('hero-canvas');
-  const ctx = canvas.getContext('2d');
-  let width, height, particles = [];
-
-  // State für Interaktion
-  const mouse = { x: -1000, y: -1000 };
-  const params = {
-    time: 0,
-    hue: 217, // Slate/Blue Bereich
-    saturation: 10, // Dezent
+const modeConfigs = {
+  classic: {
+    hue: 217,
+    saturation: 10,
     lightness: 50,
     repelRadius: 150,
-    isAttracting: false
-  };
+    baseParticleCount: 1200,
+    trailAlpha: 0.08,
+    speedMult: 1,
+    sizeScale: 1
+  },
+  vortex: {
+    hue: 217,
+    saturation: 10,
+    lightness: 50,
+    repelRadius: 150,
+    baseParticleCount: 1200,
+    trailAlpha: 0.08,
+    speedMult: 1.1,
+    sizeScale: 1
+  },
+  pulse: {
+    hue: 190,
+    saturation: 80,
+    lightness: 60,
+    repelRadius: 300,
+    baseParticleCount: 600,
+    trailAlpha: 0.15,
+    speedMult: 0.5,
+    sizeScale: 3
+  },
+  techno: {
+    hue: 150,
+    saturation: 50,
+    lightness: 40,
+    repelRadius: 100,
+    baseParticleCount: 2500,
+    trailAlpha: 0.2,
+    speedMult: 1.5,
+    sizeScale: 0.7
+  },
+  vines: {
+    hue: 280,
+    saturation: 40,
+    lightness: 60,
+    repelRadius: 200,
+    baseParticleCount: 400,
+    trailAlpha: 0.02,
+    speedMult: 0.8,
+    sizeScale: 1.5
+  }
+}
 
-  let particleCount = 1200
+const behaviors = {
+  classic: (p) => {
+    const angle = (Math.cos(p.x * 0.0035) + Math.sin(p.y * 0.005) + params.value.time) * Math.PI;
+    p.x += Math.cos(angle) * p.speed * params.value.speedMult;
+    p.y += Math.sin(angle) * p.speed * params.value.speedMult;
+  },
+  vortex: (p) => {
+    const noiseScale = 0.008;
+    const angle = (Math.cos(p.x * noiseScale) + Math.sin(p.y * noiseScale) + params.value.time) * Math.PI * 2;
+    p.x += Math.cos(angle) * p.speed * params.value.speedMult;
+    p.y += Math.sin(angle) * p.speed * params.value.speedMult;
+  },
+  pulse: (p) => {
+    p.x += Math.cos(params.value.time + p.zOffset) * p.speed * params.value.speedMult;
+    p.y += Math.sin(params.value.time + p.zOffset) * p.speed * params.value.speedMult;
+  },
+  techno: (p) => {
+    p.y += p.speed * 4 * params.value.speedMult;
+    if (p.y > height) p.y = 0;
+  },
+  vines: (p) => {
+    p.x += Math.sin(params.value.time + p.y * 0.01) * p.speed;
+    p.y -= p.speed * params.value.speedMult;
+  }
+}
+
+const getPerformanceFactor = () => {
+  if (process.server) return 1;
+  return window.innerWidth < 768 ? 0.35 : window.innerWidth < 1024 ? 0.7 : 1;
+};
+
+const updateParticleCount = () => {
+  const target = Math.floor(modeConfigs[currentMode.value].baseParticleCount * getPerformanceFactor());
+  if (particles.length < target) {
+    for (let i = particles.length; i < target; i++) particles.push(new Particle());
+  } else {
+    particles.splice(target);
+  }
+};
+
+const switchMode = (newMode) => {
+  currentMode.value = newMode;
+  const config = modeConfigs[newMode];
+
+  // WICHTIG: Wir animieren params.value, nicht params
+  gsap.to(params.value, {
+    hue: config.hue,
+    saturation: config.saturation,
+    lightness: config.lightness,
+    repelRadius: config.repelRadius,
+    trailAlpha: config.trailAlpha,
+    speedMult: config.speedMult,
+    sizeScale: config.sizeScale,
+    duration: 1.5,
+    ease: "power2.inOut",
+    onStart: updateParticleCount
+  });
+};
+
+// --- 3. PARTIKEL KLASSE ---
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * (width || 1920);
+    this.y = Math.random() * (height || 1080);
+    this.z = Math.random() * 100;
+    this.speed = Math.random() * 1.5 + 0.5;
+    this.zOffset = Math.random() * Math.PI * 2;
+  }
+  update() {
+    this.z = (Math.sin(params.value.time * 2 + this.zOffset) + 1) * 50;
+    behaviors[currentMode.value](this);
+
+    const dx = this.x - mouse.x, dy = this.y - mouse.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < params.value.repelRadius) {
+      const force = (params.value.repelRadius - dist) / params.value.repelRadius;
+      const dir = params.value.isAttracting ? -1.5 : 1;
+      this.x += (dx / dist) * force * 10 * dir;
+      this.y += (dy / dist) * force * 10 * dir;
+    }
+    if (this.x < -100 || this.x > width + 100 || this.y < -100 || this.y > height + 100) this.reset();
+  }
+  draw() {
+    // Wenn sizeScale 1 ist (wie im classic Modus),
+    // ist die Schwankung geringer als bei sizeScale 3 (pulse).
+    const scale = (this.z / 100) * params.value.sizeScale + 0.5;
+    const alpha = (this.z / 100) * 0.2 + 0.2;
+
+    ctx.fillStyle = `hsla(${params.value.hue}, ${params.value.saturation}%, ${params.value.lightness}%, ${alpha})`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, scale, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// --- 4. LIFECYCLE ---
+onMounted(() => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) activeSection.value = e.target.id });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
+
+  canvas = document.getElementById('hero-canvas');
+  ctx = canvas.getContext('2d');
 
   const resize = () => {
     width = canvas.width = document.documentElement.clientWidth;
     height = canvas.height = window.innerHeight;
-
-    if(window.innerWidth < 768){
-      particleCount = 400
-    }
-    else if(window.innerWidth < 1024){
-      particleCount = 800
-    }
+    updateParticleCount();
   };
   window.addEventListener('resize', resize);
-  window.addEventListener('mousemove', (e) => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-  });
-
-  window.addEventListener('contextmenu', (e) => e.preventDefault());
-
-  window.addEventListener('mousedown', (e) => {
-    if (e.button === 0) {
-      // LINKSKLICK: Temporäres Anziehen / Boost
-      params.isAttracting = true;
-      gsap.to(params, { saturation: 80, lightness: 40, duration: 0.3 });
-    }
-    else if (e.button === 2) {
-      // RECHTSKLICK: Dauerhafter Toggle
-      params.isAttracting = !params.isAttracting;
-
-      const targetHue = params.isAttracting ? 280 : 217;
-      const targetSat = params.isAttracting ? 60 : 10;
-
-      gsap.to(params, {
-        hue: targetHue,
-        saturation: targetSat,
-        duration: 0.8,
-        ease: "power2.inOut"
-      });
-    }
-  });
-
-// 3. Mouseup nur für Linksklick
-  window.addEventListener('mouseup', (e) => {
-    if (e.button === 0) {
-      // Nur beim Linksklick lassen wir wieder los
-      params.isAttracting = false;
-      gsap.to(params, { saturation: 10, lightness: 50, duration: 1 });
-    }
-  });
-
   resize();
 
-  class Particle {
-    constructor() {
-      this.reset();
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener('contextmenu', e => e.preventDefault());
+  window.addEventListener('mousedown', e => {
+    if (e.button === 0) {
+      params.value.isAttracting = true;
+      gsap.to(params.value, { saturation: 80, lightness: 40, duration: 0.3 });
+    } else if (e.button === 2) {
+      // Rechtsklick: Modus-Zyklus
+      const keys = Object.keys(modeConfigs);
+      const nextIdx = (keys.indexOf(currentMode.value) + 1) % keys.length;
+      switchMode(keys[nextIdx]);
     }
-
-    reset() {
-      this.x = Math.random() * width;
-      this.y = Math.random() * height;
-      this.z = Math.random() * 100;
-      this.speed = Math.random() * 1.5 + 0.5;
-      this.life = Math.random() * 200 + 100;
-      this.zOffset = Math.random() * Math.PI * 2;
+  });
+  window.addEventListener('mouseup', e => {
+    if (e.button === 0) {
+      params.value.isAttracting = false;
+      const cfg = modeConfigs[currentMode.value];
+      gsap.to(params.value, { saturation: cfg.saturation, lightness: cfg.lightness, duration: 1 });
     }
-
-    update() {
-      // 1. 3D-Wirbel Bewegung
-      // Die Tiefe (z) schwingt synchron mit der Zeit und der Position
-      this.z = (Math.sin(params.time * 2 + this.zOffset) + 1) * 50;
-
-      // Die restliche Bewegung bleibt gleich
-      const angle = (Math.cos(this.x * 0.0035) + Math.sin(this.y * 0.005) + params.time) * Math.PI;
-      this.x += Math.cos(angle) * this.speed;
-      this.y += Math.sin(angle) * this.speed;
-
-      // 2. Maus-Interaktion (Repel vs. Attract)
-      const dx = this.x - mouse.x;
-      const dy = this.y - mouse.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist < params.repelRadius) {
-        const force = (params.repelRadius - dist) / params.repelRadius;
-
-        // Richtungs-Faktor: 1 = Abstoßen, -1.5 = Starkes Anziehen
-        const direction = params.isAttracting ? -1.5 : 1;
-
-        this.x += (dx / dist) * force * 10 * direction;
-        this.y += (dy / dist) * force * 10 * direction;
-      }
-
-      this.life--;
-      if (this.life <= 0 || this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
-        this.reset();
-      }
-    }
-
-    draw() {
-      // Projektion der Z-Achse auf Größe und Sichtbarkeit
-      // Partikel "vorne" (hoher z-Wert) sind größer und klarer
-      const scale = (this.z / 100) * 1 + 0.5; // Größe zwischen 0.5 und 2.5
-      const alpha = (this.z / 100) * 0.2 + 0.2; // Deckkraft zwischen 0.1 und 0.5
-
-      ctx.fillStyle = `hsla(${params.hue}, ${params.saturation}%, ${params.lightness}%, ${alpha})`;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, scale, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+  });
 
   gsap.ticker.add(() => {
-    params.time += 0.003;
-
-    // Sanfter Trail-Effekt
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+    params.value.time += 0.003;
+    ctx.fillStyle = `rgba(255, 255, 255, ${params.value.trailAlpha})`;
     ctx.fillRect(0, 0, width, height);
-
-    particles.forEach(p => {
-      p.update();
-      p.draw();
-    });
+    particles.forEach(p => { p.update(); p.draw(); });
   });
-})
-
-const scrollToSection = (id) => {
-  gsap.to(window, {
-    duration: 1.2,
-    scrollTo: { y: id, offsetY: 64 },
-    ease: "power4.out"
-  })
-}
+});
 </script>
