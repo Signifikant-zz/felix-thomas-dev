@@ -1,5 +1,5 @@
 <template>
-  <section id="hero" class="relative min-h-screen flex items-center bg-white overflow-hidden w-full">
+  <section id="hero" ref="container" class="relative min-h-screen flex items-center bg-white overflow-hidden w-full">
 
     <canvas
         id="hero-canvas"
@@ -14,12 +14,9 @@
       <h1 class="text-6xl md:text-8xl font-bold text-slate-900 mb-4 tracking-tighter leading-none">
         FRONTEND <br />
         DEVELOPER<span class="text-blue-500">.</span><br />
-        & CREATIVE <bg />
+        & CREATIVE <br />
         TECHNOLOGIST<span class="text-blue-500">.</span>
       </h1>
-<!--      <p class="text-xl text-slate-400 max-w-2xl">-->
-<!--        Spezialisiert auf High-End Banner-Animationen (GSAP) und moderne Web-Applikationen.-->
-<!--      </p>-->
     </div>
 
     <div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 flex gap-6">
@@ -34,22 +31,21 @@
 </template>
 
 <script setup>
-import {
-  onMounted,
-  onUnmounted,
-  ref
-}                             from "vue";
-import { gsap }               from "gsap";
+import { onMounted, onUnmounted, ref } from "vue";
+import { gsap } from "gsap";
 
-let particles = []
+const container = ref(null);
+let particles = [];
+let canvas, ctx, width, height;
+let tickerFunction = null;
+let isHeroVisible = true; // Steuerung für Intersection
 
-let canvas, ctx, width, height
-
-const mouse = { x: -1000, y: -1000 }
+const mouse = { x: -1000, y: -1000 };
 
 class Particle {
   constructor() { this.reset(); }
   reset() {
+    // Falls Breite/Höhe noch nicht da sind, Nutze Window als Fallback
     const safeWidth = width > 0 ? width : window.innerWidth;
     const safeHeight = height > 0 ? height : window.innerHeight;
 
@@ -71,6 +67,8 @@ class Particle {
       this.x += (dx / dist) * force * 10 * dir;
       this.y += (dy / dist) * force * 10 * dir;
     }
+
+    // Bounds Check
     if (this.y < -100) {
       this.y = height + 100;
       this.x = Math.random() * width;
@@ -81,7 +79,6 @@ class Particle {
   }
   draw() {
     const scale = (this.z / 100) * params.value.sizeScale + 0.5;
-    // Vor dem Text: Deckender | Hinter dem Text: Transparenter
     const alpha = params.value.textBehind ? 0.6 : (this.z / 100) * 0.2 + 0.2;
 
     ctx.beginPath();
@@ -91,16 +88,16 @@ class Particle {
   }
 }
 
-const currentMode             = ref('classic')
+const currentMode = ref('classic');
 
 const resize = () => {
-  const newWidth = document.documentElement.clientWidth;
-  const newHeight = window.innerHeight;
+  if (!container.value) return;
+  const newWidth = container.value.offsetWidth;
+  const newHeight = container.value.offsetHeight;
 
   if (newWidth > 0 && newHeight > 0) {
     width = canvas.width = newWidth;
     height = canvas.height = newHeight;
-
     updateParticleCount();
   }
 };
@@ -112,7 +109,6 @@ const handleMouseDown = e => {
     params.value.isAttracting = true;
     gsap.to(params.value, { saturation: 80, lightness: 40, duration: 0.3 });
   } else if (e.button === 2) {
-    // Rechtsklick: Modus-Zyklus
     const keys = Object.keys(modeConfigs);
     const nextIdx = (keys.indexOf(currentMode.value) + 1) % keys.length;
     switchMode(keys[nextIdx]);
@@ -129,88 +125,40 @@ const handleMouseUp = e => {
 
 const handleContextMenu = e => e.preventDefault();
 
-const handleVisibilityChange = () => {
-  if (document.hidden) {
-    // Nur entfernen, wenn sie existiert
-    if (tickerFunction) gsap.ticker.remove(tickerFunction);
-  } else {
-    // Erst Größe sichern, dann Ticker an
-    resize();
-    if (tickerFunction) {
-      // Einmalig Canvas hart löschen, falls Geisterpartikel da sind
-      if (ctx) ctx.clearRect(0, 0, width, height);
-      gsap.ticker.add(tickerFunction);
-    }
-  }
+// Visibility & Intersection Logic
+const startTicker = () => {
+  if (!tickerFunction) return;
+  gsap.ticker.remove(tickerFunction); // Doppelungen vermeiden
+  gsap.ticker.add(tickerFunction);
 };
 
-let tickerFunction = null;
+const stopTicker = () => {
+  if (tickerFunction) gsap.ticker.remove(tickerFunction);
+};
+
+const handleVisibilityChange = () => {
+  if (document.hidden) {
+    stopTicker();
+  } else if (isHeroVisible) {
+    resize();
+    startTicker();
+  }
+};
 
 const params = ref({
   time: 0, hue: 217, saturation: 10, lightness: 50,
   repelRadius: 150, isAttracting: false,
   trailAlpha: 0.08, speedMult: 1, sizeScale: 1,
   textBehind: false
-})
+});
 
 const modeConfigs = {
-  classic: {
-    hue: 217,
-    saturation: 10,
-    lightness: 50,
-    repelRadius: 150,
-    baseParticleCount: 1200,
-    trailAlpha: 0.08,
-    speedMult: 1,
-    sizeScale: 1,
-    textBehind: false
-  },
-  vortex: {
-    hue: 217,
-    saturation: 10,
-    lightness: 50,
-    repelRadius: 150,
-    baseParticleCount: 1200,
-    trailAlpha: 0.08,
-    speedMult: 1.1,
-    sizeScale: 1,
-    textBehind: false
-  },
-  pulse: {
-    hue: 190,
-    saturation: 80,
-    lightness: 60,
-    repelRadius: 300,
-    baseParticleCount: 600,
-    trailAlpha: 0.15,
-    speedMult: 0.5,
-    sizeScale: 3,
-    textBehind: false
-  },
-  techno: {
-    hue: 150,
-    saturation: 50,
-    lightness: 90,
-    alpha: 0.8,
-    repelRadius: 100,
-    baseParticleCount: 2500,
-    trailAlpha: 0.2,
-    speedMult: 1.5,
-    sizeScale: 0.7,
-    textBehind: true
-  },
-  vines: {
-    hue: 280,
-    saturation: 40,
-    lightness: 60,
-    repelRadius: 200,
-    baseParticleCount: 400,
-    trailAlpha: 0.02,
-    speedMult: 0.8,
-    sizeScale: 1.5,
-    textBehind: false
-  }
-}
+  classic: { hue: 217, saturation: 10, lightness: 50, repelRadius: 150, baseParticleCount: 1200, trailAlpha: 0.08, speedMult: 1, sizeScale: 1, textBehind: false },
+  vortex: { hue: 217, saturation: 10, lightness: 50, repelRadius: 150, baseParticleCount: 1200, trailAlpha: 0.08, speedMult: 1.1, sizeScale: 1, textBehind: false },
+  pulse: { hue: 190, saturation: 80, lightness: 60, repelRadius: 300, baseParticleCount: 600, trailAlpha: 0.15, speedMult: 0.5, sizeScale: 3, textBehind: false },
+  techno: { hue: 150, saturation: 50, lightness: 90, repelRadius: 100, baseParticleCount: 2500, trailAlpha: 0.2, speedMult: 1.5, sizeScale: 0.7, textBehind: true },
+  vines: { hue: 280, saturation: 40, lightness: 60, repelRadius: 200, baseParticleCount: 400, trailAlpha: 0.02, speedMult: 0.8, sizeScale: 1.5, textBehind: false }
+};
 
 const behaviors = {
   classic: (p) => {
@@ -236,7 +184,7 @@ const behaviors = {
     p.x += Math.sin(params.value.time + p.y * 0.01) * p.speed;
     p.y -= p.speed * params.value.speedMult;
   }
-}
+};
 
 const getPerformanceFactor = () => {
   if (process.server) return 1;
@@ -255,8 +203,6 @@ const updateParticleCount = () => {
 const switchMode = (newMode) => {
   currentMode.value = newMode;
   const config = modeConfigs[newMode];
-
-  // Boolean sofort setzen für den Z-Index Wechsel
   params.value.textBehind = config.textBehind;
 
   gsap.to(params.value, {
@@ -288,20 +234,33 @@ onMounted(() => {
 
   tickerFunction = () => {
     params.value.time += 0.003;
-
     ctx.globalCompositeOperation = 'destination-out';
     ctx.fillStyle = `rgba(0, 0, 0, ${params.value.trailAlpha})`;
     ctx.fillRect(0, 0, width, height);
-
     ctx.globalCompositeOperation = 'source-over';
-
     particles.forEach(p => {
       p.update();
       p.draw();
     });
   };
 
-  gsap.ticker.add(tickerFunction);
+  // Intersection Observer
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      isHeroVisible = entry.isIntersecting;
+      if (isHeroVisible) {
+        resize(); // Hartes Reset der Maße beim Wiedereintritt
+        startTicker();
+      } else {
+        stopTicker();
+      }
+    });
+  }, { threshold: 0.01 });
+
+  if (container.value) observer.observe(container.value);
+
+  // Initialer Start
+  startTicker();
 });
 
 onUnmounted(() => {
@@ -311,9 +270,7 @@ onUnmounted(() => {
   window.removeEventListener('mouseup', handleMouseUp);
   window.removeEventListener('contextmenu', handleContextMenu);
   document.removeEventListener("visibilitychange", handleVisibilityChange);
-
-  if (tickerFunction) gsap.ticker.remove(tickerFunction);
+  stopTicker();
   particles = [];
 });
-
 </script>
