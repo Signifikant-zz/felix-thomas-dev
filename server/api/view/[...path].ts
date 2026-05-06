@@ -5,12 +5,16 @@ export default defineEventHandler(async (event) => {
   const filePath = event.context.params?.path
   if (!filePath) throw createError({ statusCode: 400 })
 
-  const fullPath = path.resolve(process.cwd(), 'server/showcase', filePath)
+  // Pfad-Logik direkt im Handler für maximale Unabhängigkeit beim Deployment
+  const vercelPath = path.resolve(process.cwd(), '.output/server/node_modules/showcase')
+  const localPath = path.resolve(process.cwd(), 'server/showcase')
+  const baseDir = fs.existsSync(vercelPath) ? vercelPath : localPath
+
+  const fullPath = path.resolve(baseDir, filePath)
 
   if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
     const ext = path.extname(fullPath).toLowerCase()
 
-    // Mapping der wichtigsten MIME-Types
     const contentTypes: Record<string, string> = {
       '.html': 'text/html',
       '.js': 'application/javascript',
@@ -26,7 +30,6 @@ export default defineEventHandler(async (event) => {
     }
 
     setResponseHeader(event, 'Content-Type', contentTypes[ext] || 'application/octet-stream')
-    // Browser-Caching für 1 Stunde aktivieren für bessere Performance
     setResponseHeader(event, 'Cache-Control', 'public, max-age=3600')
 
     return fs.readFileSync(fullPath)
