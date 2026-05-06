@@ -7,7 +7,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "sync-assets": "rm -rf server/showcase && git clone https://$GITHUB_TOKEN@github.com/Signifikant-zz/showcase-assets.git server/showcase"
   },
   "dependencies": {
     "@hypernym/nuxt-gsap": "^2.4.3",
