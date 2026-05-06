@@ -1,7 +1,7 @@
 {
   "version": 2,
   "functions": {
-    "**": {
+    "api/server/index.mjs": {
       "includeFiles": "server/showcase/**"
     }
   }
