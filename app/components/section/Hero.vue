@@ -12,11 +12,14 @@
 
     <div class="max-w-6xl mx-auto px-6 w-full select-none pointer-events-none z-10">
       <h1 class="text-6xl md:text-8xl font-bold text-slate-900 mb-4 tracking-tighter leading-none">
-        FRONTEND/<br />FULLSTACK<br />DEVELOPER<span class="text-blue-500">.</span>
+        FRONTEND <br />
+        DEVELOPER<span class="text-blue-500">.</span><br />
+        & CREATIVE <bg />
+        TECHNOLOGIST<span class="text-blue-500">.</span>
       </h1>
-      <p class="text-xl text-slate-400 max-w-2xl">
-        Spezialisiert auf High-End Banner-Animationen (GSAP) und moderne Web-Applikationen.
-      </p>
+<!--      <p class="text-xl text-slate-400 max-w-2xl">-->
+<!--        Spezialisiert auf High-End Banner-Animationen (GSAP) und moderne Web-Applikationen.-->
+<!--      </p>-->
     </div>
 
     <div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 flex gap-6">
@@ -47,8 +50,11 @@ const mouse = { x: -1000, y: -1000 }
 class Particle {
   constructor() { this.reset(); }
   reset() {
-    this.x = Math.random() * (width || 1920);
-    this.y = Math.random() * (height || 1080);
+    const safeWidth = width > 0 ? width : window.innerWidth;
+    const safeHeight = height > 0 ? height : window.innerHeight;
+
+    this.x = Math.random() * safeWidth;
+    this.y = Math.random() * safeHeight;
     this.z = Math.random() * 100;
     this.speed = Math.random() * 1.5 + 0.5;
     this.zOffset = Math.random() * Math.PI * 2;
@@ -88,9 +94,15 @@ class Particle {
 const currentMode             = ref('classic')
 
 const resize = () => {
-  width = canvas.width = document.documentElement.clientWidth;
-  height = canvas.height = window.innerHeight;
-  updateParticleCount();
+  const newWidth = document.documentElement.clientWidth;
+  const newHeight = window.innerHeight;
+
+  if (newWidth > 0 && newHeight > 0) {
+    width = canvas.width = newWidth;
+    height = canvas.height = newHeight;
+
+    updateParticleCount();
+  }
 };
 
 const handleMouseMove = e => { mouse.x = e.clientX; mouse.y = e.clientY; };
@@ -116,6 +128,21 @@ const handleMouseUp = e => {
 };
 
 const handleContextMenu = e => e.preventDefault();
+
+const handleVisibilityChange = () => {
+  if (document.hidden) {
+    // Nur entfernen, wenn sie existiert
+    if (tickerFunction) gsap.ticker.remove(tickerFunction);
+  } else {
+    // Erst Größe sichern, dann Ticker an
+    resize();
+    if (tickerFunction) {
+      // Einmalig Canvas hart löschen, falls Geisterpartikel da sind
+      if (ctx) ctx.clearRect(0, 0, width, height);
+      gsap.ticker.add(tickerFunction);
+    }
+  }
+};
 
 let tickerFunction = null;
 
@@ -255,6 +282,7 @@ onMounted(() => {
   window.addEventListener('mousedown', handleMouseDown);
   window.addEventListener('mouseup', handleMouseUp);
   window.addEventListener('contextmenu', handleContextMenu);
+  document.addEventListener("visibilitychange", handleVisibilityChange);
 
   resize();
 
@@ -282,6 +310,8 @@ onUnmounted(() => {
   window.removeEventListener('mousedown', handleMouseDown);
   window.removeEventListener('mouseup', handleMouseUp);
   window.removeEventListener('contextmenu', handleContextMenu);
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
+
   if (tickerFunction) gsap.ticker.remove(tickerFunction);
   particles = [];
 });

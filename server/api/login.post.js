@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // 1. Suche in der Supabase-Tabelle nach dem Passwort
+  // (Hinweis: Prüfe, ob die Spalte 'password' oder 'access_code' heißt)
   const { data: entry, error } = await client
     .from('portfolio_logins')
     .select('*')
@@ -22,8 +23,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Ungültiger Code' })
   }
 
-  // 2. Tracking: Erhöhe den Login-Counter direkt in der DB
-  // Wir nutzen die ID aus dem gefundenen Datenbank-Eintrag
+  // 2. Erweitertes Tracking:
+
+  // A) Bestehende Tabelle updaten (bequem für die Übersicht)
   await client
     .from('portfolio_logins')
     .update({
@@ -32,10 +34,23 @@ export default defineEventHandler(async (event) => {
     })
     .eq('id', entry.id)
 
+  // B) NEU: Detaillierten Log in die zweite Tabelle schreiben
+  const userAgent = getHeader(event, 'user-agent')
+  const ip = getHeader(event, 'x-forwarded-for') || event.node.req.socket.remoteAddress
+
+  await client
+    .from('login_tracker')
+    .insert([
+      {
+        visitor_id: entry.id, // Der Fremdschlüssel
+        user_agent: userAgent,
+        ip_address: ip
+      }
+    ])
+
   // 3. Session-Erstellung
   const sessionId = randomUUID()
 
-  // Wir speichern die ID oder den Firmennamen in der Session
   activeSessions.set(sessionId, {
     company: entry.company || 'Allgemeiner Gast',
     loginTime: new Date()
@@ -45,7 +60,7 @@ export default defineEventHandler(async (event) => {
   setCookie(event, 'portfolio_session', sessionId, { httpOnly: true, path: '/', maxAge: 60 * 60 * 24 })
   setCookie(event, 'is_logged_in', 'true', { httpOnly: false, path: '/', maxAge: 60 * 60 * 24 })
 
-  console.log(`[DB-TRACKING] Login für ${entry.company || 'Unbekannt'} erfolgreich erfasst.`)
+  console.log(`[DB-TRACKING] Login für ${entry.company || 'Unbekannt'} detailliert erfasst.`)
 
   return { success: true }
 })

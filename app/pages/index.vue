@@ -37,8 +37,15 @@ const scrollToSection = (id) => {
 
 onMounted(() => {
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) activeSection.value = e.target.id });
-  }, { threshold: 0.5 });
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        activeSection.value = e.target.id
+      }
+    });
+  }, {
+    rootMargin: '-20% 0px -70% 0px',
+    threshold: 0
+  });
 
   document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
 })
