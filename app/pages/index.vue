@@ -2,7 +2,7 @@
   <NuxtLayout>
     <template #navigation>
       <div class="flex gap-6 text-lg tracking-widest font-medium">
-        <a v-for="item in ['intro', 'expertise', 'showcase', 'cv']"
+        <a v-for="item in ['intro', 'expertise', 'development', 'showcase', 'cv']"
            :key="item"
            :href="'#' + item"
            @click.prevent="scrollToSection('#' + item)"
@@ -15,6 +15,7 @@
 
     <SectionHero />
     <SectionSkills />
+    <SectionDevelopment />
     <SectionShowcase />
     <SectionCv />
 

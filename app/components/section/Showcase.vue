@@ -135,7 +135,7 @@ const navigateCampaign = (direction) => {
     <div class="max-w-6xl mx-auto px-6">
 
       <div class="mb-16">
-        <h2 class="text-sm uppercase tracking-[0.3em] text-blue-500 font-bold mb-4">Showcase</h2>
+        <h2 class="text-sm uppercase tracking-[0.3em] text-blue-500 font-bold mb-4">Banner Showcase</h2>
         <h3 class="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight mb-10 text-balance">
           Ausgewählte Arbeiten<span class="text-blue-500">.</span>
         </h3>
