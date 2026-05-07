@@ -20,39 +20,19 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Ungültiger Code' })
   }
 
-  // Tracking
-  const userAgent = getHeader(event, 'user-agent')
-  const ip = getHeader(event, 'x-forwarded-for') || event.node.req.socket.remoteAddress
-
-  await client.from('login_tracker').insert([
-    {
-      visitor_id: entry.id,
-      user_agent: userAgent,
-      ip_address: ip
-    }
-  ])
-
   const sessionId = randomUUID()
   activeSessions.set(sessionId, {
-    company: entry.company || 'Allgemeiner Gast',
+    company: entry.company || 'Gast',
     loginTime: new Date()
   })
 
-  // FIX: Cookies mit Sicherheits-Attributen für Iframes
-  setCookie(event, 'portfolio_session', sessionId, {
-    httpOnly: true,
-    path: '/',
-    maxAge: 60 * 60 * 24,
-    sameSite: 'lax',
-    secure: true
-  })
-
+  // Den Cookie so setzen, dass er IMMER mitgesendet wird
   setCookie(event, 'is_logged_in', 'true', {
-    httpOnly: false,
     path: '/',
-    maxAge: 60 * 60 * 24,
-    sameSite: 'lax',
-    secure: true
+    maxAge: 60 * 60 * 24, // 24 Stunden
+    sameSite: 'lax',      // Erlaubt das Senden in Iframes der gleichen Domain
+    secure: true,         // Pflicht für Vercel (HTTPS)
+    httpOnly: false       // Erlaubt dem Frontend den Zugriff zur Prüfung
   })
 
   return { success: true }

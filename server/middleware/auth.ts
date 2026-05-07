@@ -3,12 +3,17 @@ import { defineEventHandler, getCookie, createError } from 'h3'
 export default defineEventHandler((event) => {
   const url = getRequestURL(event)
 
-  // Wir schützen nur die internen Daten und die Banner-Views
+  // Nur API und View-Pfade schützen
   if (url.pathname.startsWith('/api/projects') || url.pathname.startsWith('/api/view')) {
-    const loginCookie = getCookie(event, 'is_logged_in')
+    // 1. Direkter Cookie-Zugriff
+    const cookieValue = getCookie(event, 'is_logged_in')
 
-    // Check gegen den String 'true'
-    if (String(loginCookie) !== 'true') {
+    // 2. Sicherheits-Check: Wir akzeptieren alles, was nach "true" aussieht
+    const isAuthenticated = cookieValue === true ||
+      String(cookieValue) === 'true' ||
+      cookieValue === '1'
+
+    if (!isAuthenticated) {
       throw createError({
         statusCode: 401,
         statusMessage: 'Nicht autorisiert'
