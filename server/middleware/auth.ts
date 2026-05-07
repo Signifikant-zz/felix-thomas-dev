@@ -7,11 +7,11 @@ export default defineEventHandler((event) => {
   if (url.pathname.startsWith('/api/projects') || url.pathname.startsWith('/api/view')) {
     const session = getCookie(event, 'portfolio_session')
 
-    if (!session) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: 'Nicht autorisiert'
-      })
-    }
+    // if (!session) {
+    //   throw createError({
+    //     statusCode: 401,
+    //     statusMessage: 'Nicht autorisiert'
+    //   })
+    // }
   }
 })

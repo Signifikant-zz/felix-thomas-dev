@@ -1,16 +1,32 @@
-import { createError, defineEventHandler, setResponseHeader } from 'h3'
-import path from 'node:path'
+import {
+  createError,
+  defineEventHandler,
+  setResponseHeader,
+  getCookie }                 from 'h3'
+import path                   from 'node:path'
 
 export default defineEventHandler(async (event) => {
+
+  const sessionId = getCookie(event, 'portfolio_session')
+
+  if (!sessionId) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Nicht autorisiert'
+    })
+  }
+
   const filePath = event.context.params?.path
   if (!filePath) throw createError({ statusCode: 400 })
 
   const storage = useStorage()
   const allKeys = await storage.getKeys()
 
-  // Suche den Key im gesamten Storage-System
-  const searchPart = filePath.replace(/\//g, ':')
-  const storageKey = allKeys.find(key => key.includes('showcase:') && key.endsWith(searchPart))
+  // Wir bauen das Suchmuster so, dass es Slashes UND Doppelpunkte versteht
+  const searchPattern = filePath.replace(/\//g, ':')
+
+  // Wir suchen den Key, der auf den Pfad endet, egal was davor steht
+  const storageKey = allKeys.find(key => key.endsWith(searchPattern))
 
   if (storageKey) {
     const fileContent = await storage.getItemRaw(storageKey)
@@ -27,10 +43,9 @@ export default defineEventHandler(async (event) => {
     setResponseHeader(event, 'Content-Type', contentTypes[ext] || 'application/octet-stream')
     setResponseHeader(event, 'X-Frame-Options', 'SAMEORIGIN')
     setResponseHeader(event, 'Content-Security-Policy', "frame-ancestors 'self'")
-    setResponseHeader(event, 'Cache-Control', 'public, max-age=3600')
 
     return fileContent
   }
 
-  throw createError({ statusCode: 404, statusMessage: `Nicht im Storage: ${searchPart}` })
+  throw createError({ statusCode: 404, statusMessage: 'File not found' })
 })
