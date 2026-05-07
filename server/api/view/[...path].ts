@@ -6,13 +6,13 @@ export default defineEventHandler(async (event) => {
   if (!filePath) throw createError({ statusCode: 400 })
 
   const storage = useStorage()
-  // Nitro baut den Key aus: server:assets:showcase:ORDNER:DATEI
-  // Wir suchen den Key, der mit deinem Pfad endet
-  const searchPart = filePath.replace(/\//g, ':')
   const allKeys = await storage.getKeys()
-  const storageKey = allKeys.find(key => key.endsWith(searchPart))
 
-  if (storageKey && await storage.hasItem(storageKey)) {
+  // Suche den Key im gesamten Storage-System
+  const searchPart = filePath.replace(/\//g, ':')
+  const storageKey = allKeys.find(key => key.includes('showcase:') && key.endsWith(searchPart))
+
+  if (storageKey) {
     const fileContent = await storage.getItemRaw(storageKey)
     if (!fileContent) throw createError({ statusCode: 404 })
 
@@ -32,5 +32,5 @@ export default defineEventHandler(async (event) => {
     return fileContent
   }
 
-  throw createError({ statusCode: 404, statusMessage: `Datei nicht im Storage: ${searchPart}` })
+  throw createError({ statusCode: 404, statusMessage: `Nicht im Storage: ${searchPart}` })
 })
