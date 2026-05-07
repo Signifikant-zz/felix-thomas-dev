@@ -98,11 +98,12 @@ const hasFormat = (campaign, type) => {
   const t = type.toLowerCase();
   const formats = campaign.formats.map(f => (f.name || '').toLowerCase());
   if (t === 'ds') return formats.some(n => n.includes('sitebar') || n.includes('ds'));
-  if (t === 'hpa') return formats.some(n => n.includes('300x600'));
+  if (t === 'hpa') return formats.some(n => n.includes('300x600') && !n.includes('ds') && !n.includes('sitebar'));
   if (t === 'sky') return formats.some(n => (n.includes('160x600') || n.includes('skyscraper')) && !n.includes('300x600'));
   if (t === 'interstitial') return formats.some(n => n.includes('320x480') || n.includes('interstitial'));
   if (t === 'billboard') return formats.some(n => n.includes('800x250') || n.includes('970x250'));
   if (t === 'rectangle') return formats.some(n => n.includes('300x250'));
+  if (t === 'superbanner') return formats.some(n => n.includes('728x90'));
   if (t === 'fireplace' || t === 'wallpaper') return formats.some(n => n.includes(t));
   return formats.some(n => n.includes(t));
 };
@@ -229,6 +230,7 @@ const navigateCampaign = (direction) => {
                 <div v-if="hasFormat(campaign, 'interstitial')" class="w-12 h-16 border border-white/60 rounded-sm bg-white/10 relative">
                   <div class="absolute inset-1 border border-white/20 border-dashed"></div>
                 </div>
+                <div v-if="hasFormat(campaign, 'superbanner')" class="w-20 h-4 border border-white/60 rounded-sm bg-white/5"></div>
                 <div v-if="hasFormat(campaign, 'billboard')" class="w-24 h-6 border border-white/60 rounded-sm"></div>
                 <div v-if="hasFormat(campaign, 'rectangle')" class="w-12 h-10 border border-white/60 rounded-sm"></div>
                 <div v-if="hasFormat(campaign, 'fireplace')" class="flex items-start h-20 gap-0 border border-white/20 border-dashed p-1">
@@ -261,7 +263,7 @@ const navigateCampaign = (direction) => {
     <Transition name="fade">
       <div v-if="activeCampaign && isLoggedIn" class="fixed inset-0 z-[1100] flex items-center justify-center bg-slate-950/95 backdrop-blur-sm p-4 md:p-8">
         <div class="absolute inset-0" @click="closeModal"></div>
-        <div class="relative bg-white rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col text-left">
+        <div class="relative bg-white rounded-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col text-left">
 
           <div class="p-4 border-b flex justify-between items-center bg-slate-50">
             <div>
