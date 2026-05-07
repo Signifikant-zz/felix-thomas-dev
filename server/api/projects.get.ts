@@ -1,5 +1,6 @@
 export default defineEventHandler(async (event) => {
-  const storage = useStorage('assets:showcase')
+  // Der native Nuxt-Pfad für server/assets/showcase
+  const storage = useStorage('assets:server:showcase')
   const allKeys = (await storage.getKeys()) as string[]
 
   if (!allKeys || allKeys.length === 0) return []
@@ -17,8 +18,7 @@ export default defineEventHandler(async (event) => {
     const formats = formatNames.map(formatName => {
       const prefix = `${projectFolderName}:${formatName}:`
       const formatKey = projectFiles.find(key =>
-        key.startsWith(prefix) &&
-        (key.endsWith('index.html') || key.endsWith('test.html'))
+        key.startsWith(prefix) && (key.endsWith('index.html') || key.endsWith('test.html'))
       )
 
       if (formatKey) {
@@ -28,8 +28,6 @@ export default defineEventHandler(async (event) => {
         if (!startFile) return null
 
         const sizeMatch = formatName.match(/(\d+)x(\d+)/)
-        const lowerName = formatName.toLowerCase()
-
         let width: number | null = null
         let height: number | null = null
 
@@ -43,7 +41,7 @@ export default defineEventHandler(async (event) => {
           url: `/api/view/${projectFolderName}/${formatName}/${startFile}`,
           width: width,
           height: height,
-          isResponsive: lowerName.includes('fireplace') || lowerName.includes('wallpaper') || lowerName.includes('sitebar')
+          isResponsive: /fireplace|wallpaper|sitebar|ds/i.test(formatName)
         }
       }
       return null
