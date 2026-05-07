@@ -197,6 +197,7 @@ const navigateCampaign = (direction) => {
                   placeholder="Zugangscode"
                   autocomplete="current-password"
                   class="w-full px-5 py-4 bg-slate-100 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-900"
+                  style="color-scheme: light;"
               />
               <button type="submit" :disabled="isSubmitting" class="w-full bg-blue-500 text-white px-10 py-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50">
                 {{ isSubmitting ? 'Wird geprüft...' : 'Inhalte freischalten' }}
