@@ -1,20 +1,18 @@
+import fs from 'node:fs'
+import path from 'node:path'
 import { createError, defineEventHandler, setResponseHeader } from 'h3'
-import path from 'path'
 
 export default defineEventHandler(async (event) => {
-  const filePath = event.context.params?.path
-  if (!filePath) throw createError({ statusCode: 400, statusMessage: 'Pfad fehlt' })
+  const filePathParam = event.context.params?.path
+  if (!filePathParam) throw createError({ statusCode: 400 })
 
-  // Hier ebenfalls den nativen Nuxt-Präfix "assets:server:showcase" nutzen
-  const storageKey = `assets:server:showcase:${filePath.replace(/\//g, ':')}`
-  const storage = useStorage()
+  const safePath = path.normalize(filePathParam).replace(/^(\.\.(\/|\\|$))+/, '')
+  const absolutePath = path.join(process.cwd(), 'showcase_assets', safePath)
 
-  if (await storage.hasItem(storageKey)) {
-    const fileContent = await storage.getItemRaw(storageKey)
+  if (fs.existsSync(absolutePath) && fs.statSync(absolutePath).isFile()) {
+    const fileContent = fs.readFileSync(absolutePath)
 
-    if (!fileContent) throw createError({ statusCode: 404, statusMessage: 'Datei leer' })
-
-    const ext = path.extname(filePath).toLowerCase()
+    const ext = path.extname(absolutePath).toLowerCase()
     const contentTypes: Record<string, string> = {
       '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css',
       '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
@@ -22,11 +20,16 @@ export default defineEventHandler(async (event) => {
       '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.otf': 'font/otf'
     }
 
+    // Header setzen
     setResponseHeader(event, 'Content-Type', contentTypes[ext] || 'application/octet-stream')
     setResponseHeader(event, 'Cache-Control', 'public, max-age=3600')
+
+    // FIX: Erlaubt das Anzeigen der Banner in Iframes auf der gleichen Domain
+    setResponseHeader(event, 'X-Frame-Options', 'SAMEORIGIN')
+    setResponseHeader(event, 'Content-Security-Policy', "frame-ancestors 'self'")
 
     return fileContent
   }
 
-  throw createError({ statusCode: 404, statusMessage: `Nicht gefunden: ${storageKey}` })
+  throw createError({ statusCode: 404, statusMessage: 'Datei nicht gefunden' })
 })
