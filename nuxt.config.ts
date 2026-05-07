@@ -6,9 +6,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     portfolioPassword: process.env.PORTFOLIO_PASSWORD
   },
-  // NEU: Globalen Iframe-Schutz lockern (SAMEORIGIN statt DENY)
   routeRules: {
-    '/**': {
+    '/api/view/**': {
       headers: {
         'X-Frame-Options': 'SAMEORIGIN',
         'Content-Security-Policy': "frame-ancestors 'self'"

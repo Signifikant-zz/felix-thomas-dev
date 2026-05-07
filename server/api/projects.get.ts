@@ -1,9 +1,12 @@
+import { defineEventHandler, useStorage } from '#imports'
+
 export default defineEventHandler(async (event) => {
   const storage = useStorage('assets:server:showcase')
   const allKeys = (await storage.getKeys()) as string[]
 
   if (!allKeys || allKeys.length === 0) return []
 
+  // Extrahiere die Ordnernamen (Projekt-IDs)
   const projectFolders = Array.from(new Set(allKeys.map(key => key.split(':')[0])))
     .filter((name): name is string => !!name && name.length > 0)
 
