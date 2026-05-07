@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto'
 import { serverSupabaseClient } from '#supabase/server'
-import { activeSessions } from '../utils/auth'
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event)
@@ -10,6 +9,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Passwort fehlt' })
   }
 
+  // Supabase Check
   const { data: entry, error } = await client
     .from('portfolio_logins')
     .select('*')
@@ -20,19 +20,25 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Ungültiger Code' })
   }
 
+  // Tracking
+  const userAgent = getHeader(event, 'user-agent')
+  const ip = getHeader(event, 'x-forwarded-for') || event.node.req.socket.remoteAddress
+  await client.from('login_tracker').insert([{
+    visitor_id: entry.id,
+    user_agent: userAgent,
+    ip_address: ip
+  }])
+
   const sessionId = randomUUID()
-  activeSessions.set(sessionId, {
-    company: entry.company || 'Gast',
-    loginTime: new Date()
+
+  // Der Riegel für die Middleware
+  setCookie(event, 'portfolio_session', sessionId, {
+    httpOnly: true, path: '/', sameSite: 'lax', secure: true, maxAge: 60 * 60 * 24
   })
 
-  // Den Cookie so setzen, dass er IMMER mitgesendet wird
+  // Das Signal für das Frontend
   setCookie(event, 'is_logged_in', 'true', {
-    path: '/',
-    maxAge: 60 * 60 * 24, // 24 Stunden
-    sameSite: 'lax',      // Erlaubt das Senden in Iframes der gleichen Domain
-    secure: true,         // Pflicht für Vercel (HTTPS)
-    httpOnly: false       // Erlaubt dem Frontend den Zugriff zur Prüfung
+    httpOnly: false, path: '/', sameSite: 'lax', secure: true, maxAge: 60 * 60 * 24
   })
 
   return { success: true }
