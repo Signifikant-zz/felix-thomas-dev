@@ -142,7 +142,7 @@ const navigateCampaign = (direction) => {
         <div class="flex flex-col lg:flex-row gap-12 lg:gap-20">
           <div class="lg:w-1/2 text-slate-600 leading-relaxed">
             <p class="text-lg mb-6">
-              In den vergangenen sechs Jahren lag mein Schwerpunkt auf der technischen Umsetzung hochperformanter Werbemittel. In dieser Zeit habe ich eine Vielzahl nationaler und internationaler Kampagnen realisiert – stets mit dem Anspruch an <strong>höchste Präzision, Schnelligkeit und Termintreue</strong>.
+              In den vergangenen sechs Jahren lag mein Schwerpunkt auf der technischen Umsetzung hochperformanter Werbemittel. In dieser Zeit habe ich eine Vielzahl nationaler und internationaler Kampagnen realisiert – stets mit dem Anspruch an <strong>höchste Präzision, Schnelligkeit, Kunenzufriedenheit und Termintreue</strong>.
             </p>
             <p class="text-sm italic border-l-2 border-blue-500 pl-4 py-1 bg-slate-50">
               Die hier gezeigte Auswahl bietet einen kleinen Einblick in die Bandbreite meiner Arbeit. <br />

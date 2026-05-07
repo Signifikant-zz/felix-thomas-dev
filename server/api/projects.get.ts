@@ -29,10 +29,13 @@ export default defineEventHandler(async (event) => {
     }))).filter((n): n is string => !!n)
 
     const formats = formatNames.map(formatName => {
-      const formatKey = projectFiles.find(key =>
-        key.includes(`:${projectFolderName}:${formatName}:`) &&
-        (key.endsWith('index.html') || key.endsWith('test.html'))
+      const formatFiles = projectFiles.filter(key =>
+        key.includes(`:${projectFolderName}:${formatName}:`)
       )
+
+      // Gezielte Priorisierung: Suche erst test, dann index
+      const formatKey = formatFiles.find(key => key.endsWith('test.html')) ||
+        formatFiles.find(key => key.endsWith('index.html'))
 
       if (formatKey) {
         const fileName = formatKey.split(':').pop()
