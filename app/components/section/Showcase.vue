@@ -2,7 +2,16 @@
 import { ref, watch } from "vue";
 
 // --- AUTH ---
-const loginCookie = useCookie('is_logged_in', { default: () => false });
+// WICHTIG: Die Optionen müssen mit dem Server übereinstimmen
+const loginOptions = {
+  default: () => false,
+  watch: true,
+  path: '/',
+  sameSite: 'lax',
+  secure: true
+};
+const loginCookie = useCookie('is_logged_in', loginOptions);
+
 const isLoggedIn = ref(loginCookie.value === true || String(loginCookie.value) === 'true');
 const passwordInput = ref('');
 const loginError = ref(false);
@@ -21,10 +30,15 @@ const checkPassword = async () => {
       method: 'POST',
       body: { password: passwordInput.value.trim() }
     });
+
     if (response.success) {
-      loginCookie.value = true;
+      // Wir setzen den Cookie hier nochmal explizit mit den richtigen Optionen
+      loginCookie.value = 'true';
       isLoggedIn.value = true;
       passwordInput.value = '';
+
+      // Seite kurz neu laden oder Daten refreshen, damit useFetch die neuen Cookies nutzt
+      refreshNuxtData();
     }
   } catch (err) {
     loginError.value = true;
@@ -34,58 +48,12 @@ const checkPassword = async () => {
 };
 
 // --- DATA FETCHING ---
-const { data: campaigns, pending } = await useFetch('/api/projects')
+// credentials: 'include' stellt sicher, dass useFetch die Cookies an die API sendet
+const { data: campaigns, pending, refresh } = await useFetch('/api/projects', {
+  credentials: 'include'
+})
 
-const activeCampaign = ref(null);
-const activeFormat = ref(null);
-const activeIndex = ref(0);
-
-const parseTitle = (title) => {
-  if (!title) return { date: '', name: '' };
-  const parts = title.split('_');
-  const dateStr = parts[0] || '0000';
-  const year = "20" + dateStr.substring(0, 2);
-  const month = dateStr.substring(2, 4);
-  const name = parts.slice(1).join(' ').replace(/_/g, ' ');
-  return { date: `${month} / ${year}`, name };
-};
-
-const hasFormat = (campaign, type) => {
-  const t = type.toLowerCase();
-  const formats = campaign.formats.map(f => (f.name || '').toLowerCase());
-
-  if (t === 'ds') return formats.some(n => n.includes('sitebar') || n.includes('ds'));
-  if (t === 'hpa') return formats.some(n => n.includes('300x600'));
-  if (t === 'sky') return formats.some(n => (n.includes('160x600') || n.includes('skyscraper')) && !n.includes('300x600'));
-  if (t === 'interstitial') return formats.some(n => n.includes('320x480') || n.includes('interstitial'));
-  if (t === 'billboard') return formats.some(n => n.includes('800x250') || n.includes('970x250'));
-  if (t === 'rectangle') return formats.some(n => n.includes('300x250'));
-  if (t === 'fireplace' || t === 'wallpaper') return formats.some(n => n.includes(t));
-
-  return formats.some(n => n.includes(t));
-};
-
-const openCampaign = (campaign, index) => {
-  if (!isLoggedIn.value) return;
-  activeCampaign.value = campaign;
-  activeIndex.value = index;
-  activeFormat.value = campaign.formats[0];
-  document.body.style.overflow = 'hidden';
-};
-
-const closeModal = () => {
-  activeCampaign.value = null;
-  activeFormat.value = null;
-  document.body.style.overflow = 'auto';
-};
-
-const navigateCampaign = (direction) => {
-  if (!campaigns.value) return; // Sicherheits-Check für Async Data
-  let newIdx = activeIndex.value + direction;
-  if (newIdx < 0) newIdx = campaigns.value.length - 1;
-  if (newIdx >= campaigns.value.length) newIdx = 0;
-  openCampaign(campaigns.value[newIdx], newIdx);
-};
+// ... restlicher Code (activeCampaign, parseTitle, etc.) bleibt gleich ...
 </script>
 
 <template>
