@@ -1,19 +1,16 @@
 export default defineEventHandler(async (event) => {
-  // Der native Nuxt-Pfad für server/assets/showcase
   const storage = useStorage('assets:server:showcase')
   const allKeys = (await storage.getKeys()) as string[]
 
   if (!allKeys || allKeys.length === 0) return []
 
   const projectFolders = Array.from(new Set(allKeys.map(key => key.split(':')[0])))
-    .filter((name): name is string => typeof name === 'string' && name.length > 0)
+    .filter((name): name is string => !!name && name.length > 0)
 
   return projectFolders.map(projectFolderName => {
-    const projectParts = projectFolderName.split('_')
     const projectFiles = allKeys.filter(key => key.startsWith(projectFolderName + ':'))
-
     const formatNames = Array.from(new Set(projectFiles.map(key => key.split(':')[1])))
-      .filter((name): name is string => typeof name === 'string' && name.length > 0)
+      .filter((n): n is string => !!n)
 
     const formats = formatNames.map(formatName => {
       const prefix = `${projectFolderName}:${formatName}:`
@@ -25,22 +22,23 @@ export default defineEventHandler(async (event) => {
         const keyParts = formatKey.split(':')
         const startFile = keyParts[keyParts.length - 1]
 
-        if (!startFile) return null
-
         const sizeMatch = formatName.match(/(\d+)x(\d+)/)
+
+        // FIX für den TypeScript-Fehler:
+        // Wir prüfen explizit, ob die Gruppen 1 und 2 existieren, bevor wir sie parsen.
         let width: number | null = null
         let height: number | null = null
 
         if (sizeMatch && sizeMatch[1] && sizeMatch[2]) {
-          width = parseInt(sizeMatch[1])
-          height = parseInt(sizeMatch[2])
+          width = parseInt(sizeMatch[1], 10)
+          height = parseInt(sizeMatch[2], 10)
         }
 
         return {
           name: formatName,
           url: `/api/view/${projectFolderName}/${formatName}/${startFile}`,
-          width: width,
-          height: height,
+          width,
+          height,
           isResponsive: /fireplace|wallpaper|sitebar|ds/i.test(formatName)
         }
       }
@@ -50,8 +48,8 @@ export default defineEventHandler(async (event) => {
     return {
       id: projectFolderName,
       title: projectFolderName,
-      client: projectParts[1] || 'Unbekannt',
-      formats: formats
+      client: projectFolderName.split('_')[1] || 'Unbekannt',
+      formats
     }
   })
 })

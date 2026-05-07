@@ -1,45 +1,31 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import { createError, defineEventHandler, setResponseHeader } from 'h3'
+import path from 'path'
 
 export default defineEventHandler(async (event) => {
-  const filePathParam = event.context.params?.path
-  if (!filePathParam) throw createError({ statusCode: 400 })
+  const filePath = event.context.params?.path
+  if (!filePath) throw createError({ statusCode: 400 })
 
-  // Pfad-Säuberung
-  const safePath = path.normalize(filePathParam).replace(/^(\.\.(\/|\\|$))+/, '')
-  const absolutePath = path.join(process.cwd(), 'showcase_assets', safePath)
+  // Wichtig: Nitro nutzt Doppelpunkte statt Slashes im Storage-Key
+  const storageKey = `assets:server:showcase:${filePath.replace(/\//g, ':')}`
+  const storage = useStorage()
 
-  if (fs.existsSync(absolutePath) && fs.statSync(absolutePath).isFile()) {
-    const fileContent = fs.readFileSync(absolutePath)
+  if (await storage.hasItem(storageKey)) {
+    const fileContent = await storage.getItemRaw(storageKey)
+    if (!fileContent) throw createError({ statusCode: 404 })
 
-    const ext = path.extname(absolutePath).toLowerCase()
+    const ext = path.extname(filePath).toLowerCase()
     const contentTypes: Record<string, string> = {
-      '.html': 'text/html',
-      '.js': 'application/javascript',
-      '.css': 'text/css',
-      '.png': 'image/png',
-      '.jpg': 'image/jpeg',
-      '.jpeg': 'image/jpeg',
-      '.gif': 'image/gif',
-      '.svg': 'image/svg+xml',
-      '.json': 'application/json',
-      '.woff': 'font/woff',
-      '.woff2': 'font/woff2',
-      '.ttf': 'font/ttf',
-      '.otf': 'font/otf'
+      '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css',
+      '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif', '.svg': 'image/svg+xml', '.json': 'application/json',
+      '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf'
     }
 
-    // Header setzen
     setResponseHeader(event, 'Content-Type', contentTypes[ext] || 'application/octet-stream')
-    setResponseHeader(event, 'Cache-Control', 'public, max-age=3600')
-
-    // WICHTIG: Erlaubt Iframes auf der eigenen Domain
     setResponseHeader(event, 'X-Frame-Options', 'SAMEORIGIN')
     setResponseHeader(event, 'Content-Security-Policy', "frame-ancestors 'self'")
 
     return fileContent
   }
-
-  throw createError({ statusCode: 404, statusMessage: 'Datei nicht gefunden' })
+  throw createError({ statusCode: 404, statusMessage: `Key nicht gefunden: ${storageKey}` })
 })
