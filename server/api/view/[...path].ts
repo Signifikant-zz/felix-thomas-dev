@@ -1,11 +1,11 @@
-import { createError, defineEventHandler, setResponseHeader, useStorage } from 'h3'
+import { createError, defineEventHandler, setResponseHeader } from 'h3'
 import path from 'path'
 
 export default defineEventHandler(async (event) => {
   const filePath = event.context.params?.path
   if (!filePath) throw createError({ statusCode: 400 })
 
-  // Nitro Storage nutzt Doppelpunkte statt Slashes
+  // WICHTIG: Nutze die globale useStorage Funktion von Nitro
   const storageKey = `assets:server:showcase:${filePath.replace(/\//g, ':')}`
   const storage = useStorage()
 
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
     setResponseHeader(event, 'Content-Type', contentTypes[ext] || 'application/octet-stream')
     setResponseHeader(event, 'Cache-Control', 'public, max-age=3600')
 
-    // Erlaubt das Laden im Iframe auf der eigenen Domain
+    // Iframe-Erlaubnis
     setResponseHeader(event, 'X-Frame-Options', 'SAMEORIGIN')
     setResponseHeader(event, 'Content-Security-Policy', "frame-ancestors 'self'")
 
