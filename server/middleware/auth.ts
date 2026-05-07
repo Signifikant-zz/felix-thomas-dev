@@ -1,17 +1,17 @@
 export default defineEventHandler((event) => {
   const url = getRequestURL(event)
 
-  // Wir prüfen nur Anfragen, die auf unsere geschützten Banner oder Projektdaten gehen
+  // Schutz für Projekte-Liste und Banner-Dateien
   if (url.pathname.startsWith('/api/projects') || url.pathname.startsWith('/api/view')) {
     const loginCookie = getCookie(event, 'is_logged_in')
 
-    // Typsicherer Check: Wir wandeln alles in einen String um zum Vergleich
+    // Typsicherer Check gegen String
     const isAuthenticated = String(loginCookie) === 'true'
 
     if (!isAuthenticated) {
       throw createError({
         statusCode: 401,
-        statusMessage: 'Nicht autorisiert - Bitte einloggen'
+        statusMessage: 'Nicht autorisiert'
       })
     }
   }
