@@ -3,11 +3,9 @@ export default defineEventHandler((event) => {
 
   if (url.pathname.startsWith('/api/projects') || url.pathname.startsWith('/api/view')) {
     const cookies = parseCookies(event)
-    const loginCookie = cookies['is_logged_in']
+    const loginValue = cookies['is_logged_in']
 
-    const isAuthenticated = String(loginCookie) === 'true'
-
-    if (!isAuthenticated) {
+    if (String(loginValue) !== 'true') {
       throw createError({
         statusCode: 401,
         statusMessage: 'Nicht autorisiert'

@@ -21,11 +21,8 @@ export default defineEventHandler(async (event) => {
       if (formatKey) {
         const keyParts = formatKey.split(':')
         const startFile = keyParts[keyParts.length - 1]
-
         const sizeMatch = formatName.match(/(\d+)x(\d+)/)
 
-        // FIX für den TypeScript-Fehler:
-        // Wir prüfen explizit, ob die Gruppen 1 und 2 existieren, bevor wir sie parsen.
         let width: number | null = null
         let height: number | null = null
 
