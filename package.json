@@ -3,12 +3,12 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "postinstall": "nuxt prepare && npm run sync-assets",
     "sync-assets": "rm -rf assets/showcase && git clone https://$GITHUB_TOKEN@github.com/Signifikant-zz/showcase-assets.git assets/showcase",
-    "build": "npm run sync-assets && nuxt build",
+    "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "preview": "nuxt preview"
   },
   "dependencies": {
     "@hypernym/nuxt-gsap": "^2.4.3",
