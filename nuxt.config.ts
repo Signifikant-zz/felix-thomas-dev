@@ -21,10 +21,6 @@ export default defineNuxtConfig({
     }
   },
 
-  nitro: {
-    ignore: ['**/server/assets/showcase/**']
-  },
-
   supabase: { redirect: false },
 
   runtimeConfig: {
