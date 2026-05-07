@@ -1,11 +1,10 @@
 import { createError, defineEventHandler, setResponseHeader } from 'h3'
-import path from 'path'
+import path from 'node:path'
 
 export default defineEventHandler(async (event) => {
   const filePath = event.context.params?.path
   if (!filePath) throw createError({ statusCode: 400 })
 
-  // WICHTIG: Nutze die globale useStorage Funktion von Nitro
   const storageKey = `assets:server:showcase:${filePath.replace(/\//g, ':')}`
   const storage = useStorage()
 
@@ -31,13 +30,11 @@ export default defineEventHandler(async (event) => {
 
     setResponseHeader(event, 'Content-Type', contentTypes[ext] || 'application/octet-stream')
     setResponseHeader(event, 'Cache-Control', 'public, max-age=3600')
-
-    // Iframe-Erlaubnis
     setResponseHeader(event, 'X-Frame-Options', 'SAMEORIGIN')
     setResponseHeader(event, 'Content-Security-Policy', "frame-ancestors 'self'")
 
     return fileContent
   }
 
-  throw createError({ statusCode: 404, statusMessage: `Datei nicht gefunden: ${storageKey}` })
+  throw createError({ statusCode: 404, statusMessage: 'Not Found' })
 })

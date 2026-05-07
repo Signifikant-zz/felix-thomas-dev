@@ -1,9 +1,9 @@
 import { defineEventHandler } from 'h3'
 
 export default defineEventHandler(async (event) => {
-  // useStorage ist in Nuxt Server-Files global verfügbar
+  // Zugriff auf den Nitro-Storage (unser geklonter Ordner)
   const storage = useStorage('assets:server:showcase')
-  const allKeys = (await storage.getKeys()) as string[]
+  const allKeys = await storage.getKeys()
 
   if (!allKeys || allKeys.length === 0) return []
 
@@ -26,8 +26,8 @@ export default defineEventHandler(async (event) => {
         const startFile = keyParts[keyParts.length - 1]
         const sizeMatch = formatName.match(/(\d+)x(\d+)/)
 
-        let width: number | null = null
-        let height: number | null = null
+        let width = null
+        let height = null
 
         if (sizeMatch && sizeMatch[1] && sizeMatch[2]) {
           width = parseInt(sizeMatch[1], 10)
@@ -43,13 +43,13 @@ export default defineEventHandler(async (event) => {
         }
       }
       return null
-    }).filter((f): f is NonNullable<typeof f> => f !== null)
+    }).filter(f => f !== null)
 
     return {
       id: projectFolderName,
       title: projectFolderName,
       client: projectFolderName.split('_')[1] || 'Unbekannt',
-      formats
+      formats: formats
     }
   })
 })
