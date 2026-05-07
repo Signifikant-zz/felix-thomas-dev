@@ -1,22 +1,11 @@
 import fs from 'fs'
 import path from 'path'
 
-// Diese Funktion sucht den richtigen Pfad, egal ob wir lokal oder auf Vercel sind
-const getShowcasePath = () => {
-  // 1. Pfad auf Vercel
-  const vercelPath = path.resolve(process.cwd(), '.output/server/node_modules/showcase')
-  // 2. Pfad lokal
-  const localPath = path.resolve(process.cwd(), 'server/showcase')
-
-  if (fs.existsSync(vercelPath)) return vercelPath
-  return localPath
-}
-
-const baseDir = getShowcasePath()
+const baseDir = path.resolve(process.cwd(), 'server/showcase')
 
 export default defineEventHandler(async (event) => {
   if (!fs.existsSync(baseDir)) {
-    console.warn('Showcase Verzeichnis nicht gefunden unter:', baseDir)
+    console.error('VERZEICHNIS FEHLT:', baseDir)
     return []
   }
 

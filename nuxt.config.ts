@@ -1,4 +1,5 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import path from 'path'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
@@ -8,5 +9,11 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     portfolioPassword: process.env.PORTFOLIO_PASSWORD
+  },
+  nitro: {
+    serverAssets: [{
+      baseName: 'showcase',
+      dir: './server/showcase'
+    }]
   }
 })
