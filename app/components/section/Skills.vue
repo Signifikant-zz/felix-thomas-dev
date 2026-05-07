@@ -1,5 +1,5 @@
 <template>
-  <section id="skills" class="min-h-screen flex items-center bg-slate-900 py-24">
+  <section id="expertise" class="min-h-screen flex items-center bg-slate-900 py-24">
     <div class="max-w-6xl mx-auto px-6 w-full">
 
       <div class="mb-24">

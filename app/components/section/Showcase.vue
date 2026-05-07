@@ -62,13 +62,35 @@ const activeFormat = ref(null);
 const activeIndex = ref(0);
 
 const parseTitle = (title) => {
-  if (!title) return { date: '', name: '' };
+  if (!title) return { client: '', name: '' };
   const parts = title.split('_');
-  const dateStr = parts[0] || '0000';
-  const year = "20" + dateStr.substring(0, 2);
-  const month = dateStr.substring(2, 4);
-  const name = parts.slice(1).join(' ').replace(/_/g, ' ');
-  return { date: `${month} / ${year}`, name };
+
+  const dateStr = parts[0] || ''; // z.B. 2310
+  const client = parts[1] || 'PROJEKT';
+  const kampagne = parts.slice(2).join(' ').replace(/-/g, ' ');
+
+  // Quartal berechnen: 01-03 = Q1, 04-06 = Q2, etc.
+  const yearShort = dateStr.substring(0, 2);
+  const month = parseInt(dateStr.substring(2, 4), 10);
+
+  let quarter = '';
+  if (month >= 1 && month <= 3) quarter = 'Q1';
+  else if (month >= 4 && month <= 6) quarter = 'Q2';
+  else if (month >= 7 && month <= 9) quarter = 'Q3';
+  else if (month >= 10 && month <= 12) quarter = 'Q4';
+
+  const timeInfo = quarter && yearShort ? `${quarter}/${yearShort}` : '';
+
+  // Wir bauen den Namen: "Kunde + Kampagne (falls da) + Quartal"
+  // Beispiel: "Lotto Jackpot — Q4/23" oder "Lotto Q4/23"
+  const displayName = kampagne
+      ? `${client} ${kampagne} — ${timeInfo}`
+      : `${client} ${timeInfo}`;
+
+  return {
+    client: client.toUpperCase(),
+    name: displayName
+  };
 };
 
 const hasFormat = (campaign, type) => {
@@ -112,7 +134,7 @@ const navigateCampaign = (direction) => {
     <div class="max-w-6xl mx-auto px-6">
 
       <div class="mb-16">
-        <h2 class="text-sm uppercase tracking-[0.3em] text-blue-500 font-bold mb-4">Portfolio</h2>
+        <h2 class="text-sm uppercase tracking-[0.3em] text-blue-500 font-bold mb-4">Showcase</h2>
         <h3 class="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight mb-10 text-balance">
           Ausgewählte Arbeiten<span class="text-blue-500">.</span>
         </h3>
@@ -120,42 +142,63 @@ const navigateCampaign = (direction) => {
         <div class="flex flex-col lg:flex-row gap-12 lg:gap-20">
           <div class="lg:w-1/2 text-slate-600 leading-relaxed">
             <p class="text-lg mb-6">
-              In den vergangenen sechs Jahren lag mein Schwerpunkt auf der technischen Umsetzung hochperformanter Werbemittel. In dieser Zeit habe ich eine Vielzahl nationaler und internationaler Kampagnen realisiert.
+              In den vergangenen sechs Jahren lag mein Schwerpunkt auf der technischen Umsetzung hochperformanter Werbemittel. In dieser Zeit habe ich eine Vielzahl nationaler und internationaler Kampagnen realisiert – stets mit dem Anspruch an <strong>höchste Präzision, Schnelligkeit und Termintreue</strong>.
             </p>
-            <p class="text-sm italic border-l-2 border-slate-200 pl-4">
-              Die hier gezeigte Auswahl bietet einen Einblick in die Bandbreite meiner Arbeit der letzten 6 Jahre. <br />Der Zugang ist passwortgeschützt.
+            <p class="text-sm italic border-l-2 border-blue-500 pl-4 py-1 bg-slate-50">
+              Die hier gezeigte Auswahl bietet einen kleinen Einblick in die Bandbreite meiner Arbeit. <br />
+              <span class="text-slate-400 font-normal">Der Zugang ist passwortgeschützt – das Passwort finden Sie in meinen Bewerbungsunterlagen.</span>
             </p>
           </div>
 
           <div class="lg:w-1/2">
-            <h4 class="text-slate-900 font-bold mb-6 uppercase tracking-wider text-sm">Mein Fokus im Detail:</h4>
-            <ul class="space-y-6 text-sm">
+            <h4 class="text-slate-900 font-bold mb-6 uppercase tracking-wider text-xs">Expertise im Detail:</h4>
+            <ul class="space-y-6">
               <li class="flex items-start gap-4 text-slate-600">
                 <span class="text-blue-500 font-bold mt-1">/</span>
-                <span><strong>Full-Cycle Development:</strong> Animationen mit modernem HTML5, CSS3 und <strong>GSAP 3</strong>.</span>
+                <span class="text-sm leading-relaxed">
+<!--          <strong>Motion Development:</strong> Umsetzung von Animationen mit <strong>GSAP 3</strong> – basierend auf detaillierten Storyboards oder durch eigenständige kreative Gestaltung auf Basis vorhandener Layouts.-->
+                  <strong>Creative Motion Engineering:</strong> Programmierung komplexer Animationen mit <strong>GSAP 3</strong>. Die Realisierung erfolgt wahlweise auf Basis detaillierter Storyboards, vager Briefings oder in freier Gestaltung – inklusive souveräner Iteration nach Kundenfeedback.
+        </span>
               </li>
               <li class="flex items-start gap-4 text-slate-600">
                 <span class="text-blue-500 font-bold mt-1">/</span>
-                <span><strong>Design-Adaption:</strong> Pixelgenaue Umsetzung aus Figma, Adobe Suite oder Sketch.</span>
+                <span class="text-sm leading-relaxed">
+<!--              <strong>Design & Adaption:</strong> Souveräner Umgang mit Adobe Suite, Figma und Sketch. Die Bandbreite umfasst die pixelgenaue Umsetzung von Master-Layouts, deren eigenständige Adaption auf Abformate sowie die kreative Neugestaltung basierend auf bestehenden Kampagnen-Assets.-->
+              <strong>Design Integrity & Adaptation:</strong> Der Hauptfokus liegt auf der pixelgenauen Realisierung gelieferter Layouts - inklusive der lösungsorientierten Asset-Aufbereitung zur Ermöglichung komplexer Animationen. Das Spektrum umfasst zudem die eigenständige Formatadaption sowie die Konzeption neuer Layouts auf Basis bestehender Kampagnen-Assets.
+                </span>
               </li>
               <li class="flex items-start gap-4 text-slate-600">
                 <span class="text-blue-500 font-bold mt-1">/</span>
-                <span><strong>Technical Excellence:</strong> Asset-Optimierung und strikte Einhaltung von Specs.</span>
+                <span class="text-sm leading-relaxed">
+<!--          <strong>Technical Delivery:</strong> Strikte Einhaltung technischer Spezifikationen inkl. Asset-Optimierung zur Einhaltung von Dateigrößen-Grenzen – auch unter engen Deadlines und in intensiven Feedback-Zyklen.-->
+       <strong>Technical Delivery & Ad Management:</strong> Strikte Einhaltung technischer Spezifikationen inkl. Asset-Optimierung. Erprobte Routine im Setup und Deployment auf Plattformen wie Flashtalking, CM360 oder DCStudio – auch unter engen Deadlines.
+        </span>
               </li>
             </ul>
           </div>
         </div>
+
       </div>
 
-      <div class="relative">
-        <div v-if="!isLoggedIn" class="absolute -inset-4 z-50 flex items-center justify-center bg-slate-900/5 backdrop-blur-xl rounded-3xl border border-slate-100/50 shadow-inner">
-          <div class="max-w-md w-full bg-white p-10 rounded-3xl shadow-2xl text-center border border-slate-100 border-t-8 border-t-blue-500 mx-6">
+      <div class="relative min-h-[700px]">
+
+        <div v-if="!isLoggedIn"
+             class="absolute inset-0 z-50 flex items-start justify-center pt-32 bg-white/40 backdrop-blur-md rounded-3xl border border-slate-100 transition-all duration-500">
+
+          <div class="max-w-md w-full bg-white p-10 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] text-center border border-slate-100 border-t-8 border-t-blue-500 mx-6 relative z-[60]">
             <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-inner">🔒</div>
             <h3 class="text-2xl font-bold text-slate-900 mb-2">Geschützter Inhalt</h3>
             <p class="text-slate-500 mb-8 text-sm">Geben Sie Ihren Zugangscode ein, um das Showcase freizuschalten.</p>
+
             <form @submit.prevent="checkPassword" class="space-y-4">
-              <input v-model="passwordInput" type="password" placeholder="Zugangscode" class="w-full px-5 py-4 bg-slate-100 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
-              <button type="submit" class="w-full bg-blue-500 text-white px-10 py-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-all active:scale-95">
+              <input
+                  v-model="passwordInput"
+                  type="password"
+                  placeholder="Zugangscode"
+                  autocomplete="current-password"
+                  class="w-full px-5 py-4 bg-slate-100 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-900"
+              />
+              <button type="submit" :disabled="isSubmitting" class="w-full bg-blue-500 text-white px-10 py-4 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50">
                 {{ isSubmitting ? 'Wird geprüft...' : 'Inhalte freischalten' }}
               </button>
               <p v-if="loginError" class="text-red-500 text-xs mt-2 font-medium">Ungültiger Code.</p>
@@ -165,7 +208,10 @@ const navigateCampaign = (direction) => {
 
         <div v-if="pending" class="text-center py-20 text-slate-400">Scanne Projekte...</div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-700" :class="{ 'opacity-10 pointer-events-none grayscale blur-sm': !isLoggedIn }">
+        <div v-else
+             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-700"
+             :class="{ 'opacity-40 grayscale blur-sm pointer-events-none select-none': !isLoggedIn }">
+
           <div v-for="(campaign, index) in campaigns" :key="index" @click="openCampaign(campaign, index)"
                class="group cursor-pointer bg-white rounded-2xl overflow-hidden border border-slate-100 hover:shadow-2xl transition-all duration-500 flex flex-col">
 
@@ -174,25 +220,22 @@ const navigateCampaign = (direction) => {
                 {{ parseTitle(campaign.title).name.substring(0,3) }}
               </div>
               <div class="relative z-10 flex gap-4 items-end opacity-40 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110">
-
                 <div v-if="hasFormat(campaign, 'ds')" class="w-10 h-20 border-2 border-blue-500 rounded-sm relative flex items-center justify-center bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
                   <div class="flex flex-col items-center leading-none text-blue-400 font-black text-lg"><span>→</span><span>↓</span></div>
                 </div>
-
                 <div v-if="hasFormat(campaign, 'hpa')" class="w-10 h-20 border-2 border-white/80 rounded-sm bg-white/10"></div>
-
                 <div v-else-if="hasFormat(campaign, 'sky')" class="w-5 h-20 border border-white/60 rounded-sm"></div>
-
                 <div v-if="hasFormat(campaign, 'interstitial')" class="w-12 h-16 border border-white/60 rounded-sm bg-white/5 relative">
                   <div class="absolute inset-1 border border-white/20 border-dashed"></div>
                 </div>
-
                 <div v-if="hasFormat(campaign, 'billboard')" class="w-24 h-6 border border-white/60 rounded-sm"></div>
-
                 <div v-if="hasFormat(campaign, 'rectangle')" class="w-12 h-10 border border-white/60 rounded-sm"></div>
-
                 <div v-if="hasFormat(campaign, 'fireplace')" class="flex items-start h-20 gap-0 border border-white/20 border-dashed p-1">
                   <div class="w-3 h-full bg-white/60"></div>
+                  <div class="w-16 h-4 bg-white/80 mx-[2px]"></div>
+                  <div class="w-3 h-full bg-white/60"></div>
+                </div>
+                <div v-if="hasFormat(campaign, 'wallpaper')" class="flex items-start h-20 gap-0 border border-white/20 border-dashed p-1">
                   <div class="w-16 h-4 bg-white/80 mx-[2px]"></div>
                   <div class="w-3 h-full bg-white/60"></div>
                 </div>
@@ -215,7 +258,7 @@ const navigateCampaign = (direction) => {
     </div>
 
     <Transition name="fade">
-      <div v-if="activeCampaign && isLoggedIn" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/95 backdrop-blur-sm p-4 md:p-8">
+      <div v-if="activeCampaign && isLoggedIn" class="fixed inset-0 z-[1100] flex items-center justify-center bg-slate-950/95 backdrop-blur-sm p-4 md:p-8">
         <div class="absolute inset-0" @click="closeModal"></div>
         <div class="relative bg-white rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col text-left">
 
@@ -239,7 +282,6 @@ const navigateCampaign = (direction) => {
             </div>
 
             <div class="flex-1 bg-slate-200 p-4 md:p-12 flex items-center justify-center overflow-auto relative">
-
               <div v-if="activeFormat && activeFormat.width && !activeFormat.isResponsive"
                    class="bg-white shadow-2xl relative"
                    :style="{ width: activeFormat.width + 'px', height: activeFormat.height + 'px' }">

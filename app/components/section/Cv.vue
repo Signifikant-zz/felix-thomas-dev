@@ -2,7 +2,7 @@
   <section id="cv" class="py-24 bg-[#1a202c] text-slate-200">
     <div class="max-w-5xl mx-auto px-6">
 
-      <h2 class="text-4xl font-black mb-20 text-slate-100 tracking-tight">Werdegang</h2>
+      <h2 class="text-4xl font-black mb-20 text-slate-100 tracking-tight">Curriculum Vitae</h2>
 
       <div class="mb-24">
         <h3 class="text-2xl font-bold mb-10 text-slate-150 border-b border-slate-700 pb-4">berufliche & praktische Erfahrung</h3>

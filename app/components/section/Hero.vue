@@ -1,5 +1,5 @@
 <template>
-  <section id="hero" ref="container" class="relative min-h-screen flex items-center bg-white overflow-hidden w-full">
+  <section id="intro" ref="container" class="relative min-h-screen flex items-center bg-white overflow-hidden w-full">
 
     <canvas
         id="hero-canvas"
@@ -11,6 +11,13 @@
     ></canvas>
 
     <div class="max-w-6xl mx-auto px-6 w-full select-none pointer-events-none z-10">
+<!--      <div class="mb-0.5 overflow-hidden">-->
+<!--        <span class="text-xl md:text-2xl font-bold tracking-tighter block transform translate-y-0">-->
+<!--          <span class="text-slate-500">FELIX</span>-->
+<!--          <span class="text-blue-500">THOMAS</span>-->
+<!--        </span>-->
+<!--      </div>-->
+
       <h1 class="text-6xl md:text-8xl font-bold text-slate-900 mb-4 tracking-tighter leading-none">
         FRONTEND <br />
         DEVELOPER<span class="text-blue-500">.</span><br />
@@ -43,7 +50,12 @@ let isHeroVisible = true; // Steuerung für Intersection
 const mouse = { x: -1000, y: -1000 };
 
 class Particle {
-  constructor() { this.reset(); }
+  constructor() {
+    this.reset();
+    // Initialisieren mit zufälliger Lebensdauer, damit nicht alle gleichzeitig sterben
+    this.life = Math.random() * 500;
+  }
+
   reset() {
     // Falls Breite/Höhe noch nicht da sind, Nutze Window als Fallback
     const safeWidth = width > 0 ? width : window.innerWidth;
@@ -54,13 +66,31 @@ class Particle {
     this.z = Math.random() * 100;
     this.speed = Math.random() * 1.5 + 0.5;
     this.zOffset = Math.random() * Math.PI * 2;
+
+    // Lebensdauer-Parameter
+    this.life = 0;
+    this.maxLife = 200 + Math.random() * 400; // Zwischen 200 und 600 Frames
   }
+
   update() {
+    // --- LEBENSDAUER-CHECK (Spezifisch für Classic) ---
+    // Verhindert das "Zusammenkleben" zu Linien durch regelmäßigen Respawn
+    if (currentMode.value === 'classic') {
+      this.life++;
+      if (this.life > this.maxLife) {
+        this.reset();
+      }
+    }
+
+    // Animation & Tiefe
     this.z = (Math.sin(params.value.time * 2 + this.zOffset) + 1) * 50;
+
+    // Das jeweilige Bewegungsverhalten aus dem behaviors-Objekt aufrufen
     behaviors[currentMode.value](this);
 
+    // --- INTERAKTION (Mouse Repel/Attract) ---
     const dx = this.x - mouse.x, dy = this.y - mouse.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
+    const dist = Math.sqrt(dx * dx + dy * dy);
     if (dist < params.value.repelRadius) {
       const force = (params.value.repelRadius - dist) / params.value.repelRadius;
       const dir = params.value.isAttracting ? -1.5 : 1;
@@ -68,15 +98,28 @@ class Particle {
       this.y += (dy / dist) * force * 10 * dir;
     }
 
-    // Bounds Check
-    if (this.y < -100) {
-      this.y = height + 100;
-      this.x = Math.random() * width;
-    }
-    if (this.x < -100 || this.x > width + 100 || this.y > height + 100) {
-      this.reset();
+    // --- BOUNDS CHECK (Spezifisch nach Modus) ---
+    const margin = 100;
+    if (
+        this.x < -margin ||
+        this.x > width + margin ||
+        this.y < -margin ||
+        this.y > height + margin
+    ) {
+      if (currentMode.value === 'classic') {
+        // Im Classic-Modus: Komplett neu würfeln für gleichmäßige Verteilung
+        this.reset();
+      } else {
+        // In anderen Modi (z.B. Techno): Einfaches Wrapping am Rand
+        if (this.y < -margin) this.y = height + margin;
+        else if (this.y > height + margin) this.y = -margin;
+
+        if (this.x < -margin) this.x = width + margin;
+        else if (this.x > width + margin) this.x = -margin;
+      }
     }
   }
+
   draw() {
     const scale = (this.z / 100) * params.value.sizeScale + 0.5;
     const alpha = params.value.textBehind ? 0.6 : (this.z / 100) * 0.2 + 0.2;
@@ -153,7 +196,7 @@ const params = ref({
 });
 
 const modeConfigs = {
-  classic: { hue: 217, saturation: 10, lightness: 50, repelRadius: 150, baseParticleCount: 1200, trailAlpha: 0.08, speedMult: 1, sizeScale: 1, textBehind: false },
+  classic: { hue: 217, saturation: 10, lightness: 50, repelRadius: 150, baseParticleCount: 1400, trailAlpha: 0.08, speedMult: 1, sizeScale: 1.1, textBehind: false },
   vortex: { hue: 217, saturation: 10, lightness: 50, repelRadius: 150, baseParticleCount: 1200, trailAlpha: 0.08, speedMult: 1.1, sizeScale: 1, textBehind: false },
   pulse: { hue: 190, saturation: 80, lightness: 60, repelRadius: 300, baseParticleCount: 600, trailAlpha: 0.15, speedMult: 0.5, sizeScale: 3, textBehind: false },
   techno: { hue: 150, saturation: 50, lightness: 90, repelRadius: 100, baseParticleCount: 2500, trailAlpha: 0.2, speedMult: 1.5, sizeScale: 0.7, textBehind: true },
@@ -162,9 +205,12 @@ const modeConfigs = {
 
 const behaviors = {
   classic: (p) => {
-    const angle = (Math.cos(p.x * 0.0035) + Math.sin(p.y * 0.005) + params.value.time) * Math.PI;
-    p.x += Math.cos(angle) * p.speed * params.value.speedMult;
-    p.y += Math.sin(angle) * p.speed * params.value.speedMult;
+    const angle1 = (Math.cos(p.x * 0.002) + Math.sin(p.y * 0.002) + params.value.time) * Math.PI;
+    const angle2 = (Math.sin(p.x * 0.01 - params.value.time) + Math.cos(p.y * 0.01 - params.value.time)) * Math.PI;
+    const finalAngle = angle1 * 0.8 + angle2 * 0.4;
+
+    p.x += Math.cos(finalAngle) * p.speed * params.value.speedMult;
+    p.y += Math.sin(finalAngle) * p.speed * params.value.speedMult;
   },
   vortex: (p) => {
     const noiseScale = 0.008;
@@ -274,3 +320,4 @@ onUnmounted(() => {
   particles = [];
 });
 </script>
+

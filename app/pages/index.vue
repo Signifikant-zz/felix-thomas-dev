@@ -1,13 +1,13 @@
 <template>
   <NuxtLayout>
     <template #navigation>
-      <div class="flex gap-6 text-sm uppercase tracking-widest font-medium">
-        <a v-for="item in ['hero', 'skills', 'showcase', 'cv']"
+      <div class="flex gap-6 text-lg tracking-widest font-medium">
+        <a v-for="item in ['intro', 'expertise', 'showcase', 'cv']"
            :key="item"
            :href="'#' + item"
            @click.prevent="scrollToSection('#' + item)"
            :class="activeSection === item ? 'text-blue-500' : 'text-slate-400 hover:text-white'"
-           class="transition-colors duration-300 capitalize">
+           class="transition-colors duration-300">
           {{ item }}
         </a>
       </div>
@@ -36,18 +36,38 @@ const scrollToSection = (id) => {
 }
 
 onMounted(() => {
+  const sections = document.querySelectorAll('section[id]');
+
+  const observerOptions = {
+    // Dieser Margin erstellt einen Sensor-Streifen:
+    // Er liegt 30% von oben und endet 69% vor dem unteren Rand.
+    // Das heißt: Der Sensor ist fast eine Linie bei 30% der Höhe.
+    rootMargin: '-30% 0px -69% 0px',
+    threshold: 0
+  };
+
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        activeSection.value = e.target.id
+    entries.forEach((entry) => {
+      // NUR wenn die Section den Sensor-Streifen berührt, wird sie aktiv.
+      if (entry.isIntersecting) {
+        activeSection.value = entry.target.id;
       }
     });
-  }, {
-    rootMargin: '-20% 0px -70% 0px',
-    threshold: 0
+  }, observerOptions);
+
+  sections.forEach((s) => observer.observe(s));
+
+  // INITIALER CHECK: Damit Hero beim Laden aktiv ist
+  // Wir prüfen, welche Section gerade den Punkt bei 30% überlappt
+  const triggerPoint = window.innerHeight * 0.3;
+  const initialSection = Array.from(sections).find(s => {
+    const rect = s.getBoundingClientRect();
+    return rect.top <= triggerPoint && rect.bottom >= triggerPoint;
   });
 
-  document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
-})
+  if (initialSection) {
+    activeSection.value = initialSection.id;
+  }
+});
 
 </script>
