@@ -221,22 +221,22 @@ const navigateCampaign = (direction) => {
                 {{ parseTitle(campaign.title).name.substring(0,3) }}
               </div>
               <div class="relative z-10 flex gap-4 items-end opacity-40 group-hover:opacity-100 transition-all duration-500 group-hover:scale-110">
-                <div v-if="hasFormat(campaign, 'ds')" class="w-10 h-20 border-2 border-blue-500 rounded-sm relative flex items-center justify-center bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-                  <div class="flex flex-col items-center leading-none text-blue-400 font-black text-lg"><span>→</span><span>↓</span></div>
+                <div v-if="hasFormat(campaign, 'ds')" class="w-10 h-20 border-2 border-white/60 rounded-sm relative flex items-center justify-center bg-white/10 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                  <div class="flex flex-col items-center leading-none text-white/60 font-black text-lg"><span>→</span><span>↓</span></div>
                 </div>
-                <div v-if="hasFormat(campaign, 'hpa')" class="w-10 h-20 border-2 border-white/80 rounded-sm bg-white/10"></div>
+                <div v-if="hasFormat(campaign, 'hpa')" class="w-10 h-20 border-2 border-white/60 rounded-sm bg-white/5"></div>
                 <div v-else-if="hasFormat(campaign, 'sky')" class="w-5 h-20 border border-white/60 rounded-sm"></div>
-                <div v-if="hasFormat(campaign, 'interstitial')" class="w-12 h-16 border border-white/60 rounded-sm bg-white/5 relative">
+                <div v-if="hasFormat(campaign, 'interstitial')" class="w-12 h-16 border border-white/60 rounded-sm bg-white/10 relative">
                   <div class="absolute inset-1 border border-white/20 border-dashed"></div>
                 </div>
                 <div v-if="hasFormat(campaign, 'billboard')" class="w-24 h-6 border border-white/60 rounded-sm"></div>
                 <div v-if="hasFormat(campaign, 'rectangle')" class="w-12 h-10 border border-white/60 rounded-sm"></div>
                 <div v-if="hasFormat(campaign, 'fireplace')" class="flex items-start h-20 gap-0 border border-white/20 border-dashed p-1">
                   <div class="w-3 h-full bg-white/60"></div>
-                  <div class="w-16 h-4 bg-white/80 mx-[2px]"></div>
+                  <div class="w-16 h-4 bg-white/60 mx-[2px]"></div>
                   <div class="w-3 h-full bg-white/60"></div>
                 </div>
-                <div v-if="hasFormat(campaign, 'wallpaper')" class="flex items-start h-20 gap-0 border border-white/20 border-dashed p-1">
+                <div v-if="hasFormat(campaign, 'wallpaper')" class="flex items-start h-20 gap-0 border border-white/10 border-dashed p-1">
                   <div class="w-16 h-4 bg-white/80 mx-[2px]"></div>
                   <div class="w-3 h-full bg-white/60"></div>
                 </div>
