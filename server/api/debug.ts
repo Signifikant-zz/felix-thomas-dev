@@ -1,23 +1,11 @@
-import fs from 'fs'
-import path from 'path'
-
 export default defineEventHandler(async (event) => {
-  const pathsToCheck = {
-    cwd: process.cwd(),
-    showcase: path.resolve(process.cwd(), 'server/showcase'),
-    outputShowcase: path.resolve(process.cwd(), '.output/server/server/showcase')
+  const storage = useStorage('assets:showcase')
+  const keys = await storage.getKeys()
+
+  return {
+    message: "Prüfe virtuellen Nitro Storage",
+    itemCount: keys.length,
+    firstTenKeys: keys.slice(0, 10),
+    allKeys: keys
   }
-
-  const results: any = {}
-
-  for (const [name, p] of Object.entries(pathsToCheck)) {
-    results[name] = {
-      path: p,
-      exists: fs.existsSync(p),
-      isDir: fs.existsSync(p) ? fs.statSync(p).isDirectory() : false,
-      content: fs.existsSync(p) && fs.statSync(p).isDirectory() ? fs.readdirSync(p) : []
-    }
-  }
-
-  return results
 })
