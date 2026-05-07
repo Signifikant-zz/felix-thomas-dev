@@ -1,17 +1,25 @@
-import fs from 'fs'
-import path from 'path'
+import { createError, defineEventHandler, setResponseHeader } from 'h3'
+import path from 'path' // Dieser Import hat gefehlt!
 
 export default defineEventHandler(async (event) => {
   const filePath = event.context.params?.path
-  if (!filePath) throw createError({ statusCode: 400 })
+  if (!filePath) throw createError({ statusCode: 400, statusMessage: 'Pfad fehlt' })
 
-  const baseDir = path.resolve(process.cwd(), 'server/showcase')
-  const fullPath = path.resolve(baseDir, filePath)
+  // WICHTIG: Slashes in Doppelpunkte umwandeln für Nitro Storage
+  // Nitro Storage (assets:showcase) nutzt Doppelpunkte als Trenner
+  const storageKey = `assets:showcase:${filePath.replace(/\//g, ':')}`
+  const storage = useStorage()
 
-  if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
-    const ext = path.extname(fullPath).toLowerCase()
+  // Prüfen, ob die Datei im virtuellen Bundle existiert
+  if (await storage.hasItem(storageKey)) {
+    // getItemRaw liest die Datei als Buffer (wichtig für Bilder/Binary)
+    const fileContent = await storage.getItemRaw(storageKey)
 
-    // Mapping der wichtigsten MIME-Types
+    if (!fileContent) {
+      throw createError({ statusCode: 404, statusMessage: 'Dateiinhalt leer' })
+    }
+
+    const ext = path.extname(filePath).toLowerCase()
     const contentTypes: Record<string, string> = {
       '.html': 'text/html',
       '.js': 'application/javascript',
@@ -27,11 +35,11 @@ export default defineEventHandler(async (event) => {
     }
 
     setResponseHeader(event, 'Content-Type', contentTypes[ext] || 'application/octet-stream')
-    // Browser-Caching für 1 Stunde aktivieren
+    // Browser-Caching aktivieren, da sich die Banner-Assets selten ändern
     setResponseHeader(event, 'Cache-Control', 'public, max-age=3600')
 
-    return fs.readFileSync(fullPath)
+    return fileContent
   }
 
-  throw createError({ statusCode: 404, statusMessage: 'Datei nicht gefunden' })
+  throw createError({ statusCode: 404, statusMessage: 'Datei im Storage nicht gefunden' })
 })

@@ -13,7 +13,7 @@ export default defineNuxtConfig({
   nitro: {
     serverAssets: [{
       baseName: 'showcase',
-      dir: './server/showcase'
+      dir: './assets/showcase' // Beachte: assets/ statt server/showcase
     }]
   }
 })

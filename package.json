@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "sync-assets": "rm -rf server/showcase && git clone https://$GITHUB_TOKEN@github.com/Signifikant-zz/showcase-assets.git server/showcase",
+    "sync-assets": "rm -rf assets/showcase && git clone https://$GITHUB_TOKEN@github.com/Signifikant-zz/showcase-assets.git assets/showcase",
     "build": "npm run sync-assets && nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",

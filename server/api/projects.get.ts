@@ -1,35 +1,33 @@
-import fs from 'fs'
-import path from 'path'
-
-const baseDir = path.resolve(process.cwd(), 'server/showcase')
-
 export default defineEventHandler(async (event) => {
-  if (!fs.existsSync(baseDir)) {
-    console.error('VERZEICHNIS FEHLT:', baseDir)
-    return []
-  }
+  const storage = useStorage('assets:showcase')
+  const allKeys = await storage.getKeys()
 
-  const projectFolders = fs.readdirSync(baseDir).filter(f =>
-    fs.statSync(path.join(baseDir, f)).isDirectory()
-  )
+  if (allKeys.length === 0) return []
+
+  // Projekte extrahieren und sicherstellen, dass ein Name existiert
+  const projectFolders = Array.from(new Set(allKeys.map(key => key.split(':')[0])))
+    .filter((name): name is string => !!name) // IDE Fix: filtert undefined/leere Namen
 
   return projectFolders.map(projectFolderName => {
-    const projectPath = path.join(baseDir, projectFolderName)
-    const formats: any[] = []
-
     const projectParts = projectFolderName.split('_')
+    const projectFiles = allKeys.filter(key => key.startsWith(projectFolderName + ':'))
 
-    const formatFolders = fs.readdirSync(projectPath).filter(f =>
-      fs.statSync(path.join(projectPath, f)).isDirectory()
-    )
+    // Formate extrahieren und validieren
+    const formatNames = Array.from(new Set(projectFiles.map(key => key.split(':')[1])))
+      .filter((name): name is string => !!name) // IDE Fix: filtert undefined
 
-    for (const formatName of formatFolders) {
-      const formatPath = path.join(projectPath, formatName)
-      const files = fs.readdirSync(formatPath)
+    const formats = formatNames.map(formatName => {
+      const formatKey = projectFiles.find(key =>
+        key.startsWith(`${projectFolderName}:${formatName}:`) &&
+        (key.endsWith('index.html') || key.endsWith('test.html'))
+      )
 
-      const startFile = files.find(f => f === 'test.html' || f === 'index.html')
+      if (formatKey) {
+        const keyParts = formatKey.split(':')
+        const startFile = keyParts[keyParts.length - 1] // IDE Fix: sicherer Zugriff aufs Ende
 
-      if (startFile) {
+        if (!startFile) return null
+
         const lowerName = formatName.toLowerCase()
         const isFireplace = lowerName.includes('fireplace')
         const isWallpaper = lowerName.includes('wallpaper')
@@ -44,21 +42,22 @@ export default defineEventHandler(async (event) => {
           height = parseInt(sizeMatch[2])
         }
 
-        formats.push({
+        return {
           name: formatName,
           url: `/api/view/${projectFolderName}/${formatName}/${startFile}`,
-          width: width,
-          height: height,
+          width,
+          height,
           isResponsive: isFireplace || isWallpaper || isSitebar
-        })
+        }
       }
-    }
+      return null
+    }).filter((f): f is NonNullable<typeof f> => f !== null)
 
     return {
       id: projectFolderName,
       title: projectFolderName,
       client: projectParts[1] || 'Unbekannt',
-      formats: formats
+      formats
     }
   })
 })
