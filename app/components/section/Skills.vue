@@ -44,7 +44,7 @@
             AdTech
           </h4>
           <ul class="space-y-6 cursor-default">
-            <li v-for="item in ['CM360', 'Doubleclick Studio', 'Flashtalking', 'Dynamic Content', 'GWD']"
+            <li v-for="item in ['CM360', 'DCStudio', 'Flashtalking', 'Dynamic Content', 'GWD']"
                 :key="item"
                 class="text-3xl md:text-4xl font-medium text-slate-100">
               {{ item }}
