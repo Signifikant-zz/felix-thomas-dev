@@ -165,7 +165,7 @@ const navigateCampaign = (direction) => {
                 <span class="text-blue-500 font-bold mt-1">/</span>
                 <span class="text-sm leading-relaxed">
 <!--              <strong>Design & Adaption:</strong> Souveräner Umgang mit Adobe Suite, Figma und Sketch. Die Bandbreite umfasst die pixelgenaue Umsetzung von Master-Layouts, deren eigenständige Adaption auf Abformate sowie die kreative Neugestaltung basierend auf bestehenden Kampagnen-Assets.-->
-              <strong>Design Integrity & Adaptation:</strong> Der Hauptfokus liegt auf der pixelgenauen Realisierung gelieferter Layouts - inklusive der lösungsorientierten Asset-Aufbereitung zur Ermöglichung komplexer Animationen. Das Spektrum umfasst zudem die eigenständige Formatadaption sowie die Konzeption neuer Layouts auf Basis bestehender Kampagnen-Assets.
+              <strong>Design Integrity & Adaptation:</strong> Der Hauptfokus liegt auf der pixelgenauen Realisierung gelieferter Layouts - inklusive der ergebnisorientierten Asset-Aufbereitung zur Ermöglichung komplexer Animationen. Das Spektrum umfasst zudem die eigenständige Formatadaption sowie die Konzeption neuer Layouts auf Basis bestehender Kampagnen-Assets.
                 </span>
               </li>
               <li class="flex items-start gap-4 text-slate-600">

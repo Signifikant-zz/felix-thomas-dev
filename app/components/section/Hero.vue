@@ -23,7 +23,7 @@
 <!--        </span>-->
 <!--      </div>-->
 
-      <h1 class="text-4xl sm:text-6xl md:text-8xl font-bold text-slate-900 mb-4 tracking-tighter leading-none">
+      <h1 class="text-4xl xs:text-6xl md:text-8xl font-bold text-slate-900 mb-4 tracking-tighter leading-none">
         FRONTEND <br />
         DEVELOPER<span class="text-blue-500">.</span><br />
         & CREATIVE <br />
