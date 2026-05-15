@@ -55,7 +55,11 @@
 </template>
 
 <script setup>
-import { onMounted, ref }     from 'vue'
+import {
+  onMounted,
+  onUnmounted,
+  ref
+}                             from 'vue'
 import { gsap }               from 'gsap'
 import { ScrollToPlugin }     from 'gsap/ScrollToPlugin'
 import { ScrollTrigger }      from 'gsap/ScrollTrigger'
@@ -103,33 +107,41 @@ const backdropLeave = (el, done) => {
   )
 }
 
+const handleRefresh = () => {
+  setTimeout(() => {
+    ScrollTrigger.refresh();
+  }, 100);
+};
+
+const handleResize = () => {
+  ScrollTrigger.refresh();
+};
+
 onMounted(() => {
-  const sections = document.querySelectorAll('section[id]');
+  ScrollTrigger.getAll().forEach(t => t.kill());
 
-  const observerOptions = {
-    rootMargin: '-30% 0px -69% 0px',
-    threshold: 0
-  };
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        activeSection.value = entry.target.id;
+  navItems.forEach((item) => {
+    ScrollTrigger.create({
+      trigger: `#${item}`,
+      start: "top 40%",
+      end: "bottom 40%",
+      onToggle: (self) => {
+        if (self.isActive) activeSection.value = item;
       }
     });
-  }, observerOptions);
-
-  sections.forEach((s) => observer.observe(s));
-
-  const triggerPoint = window.innerHeight * 0.3;
-  const initialSection = Array.from(sections).find(s => {
-    const rect = s.getBoundingClientRect();
-    return rect.top <= triggerPoint && rect.bottom >= triggerPoint;
   });
 
-  if (initialSection) {
-    activeSection.value = initialSection.id;
-  }
+  window.addEventListener('resize', handleResize);
+  window.addEventListener('content-updated', handleRefresh);
+
+  ScrollTrigger.refresh();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+  window.removeEventListener('content-updated', handleRefresh);
+
+  ScrollTrigger.getAll().forEach(t => t.kill());
 });
 
 </script>

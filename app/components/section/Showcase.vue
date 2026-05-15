@@ -48,6 +48,8 @@ const checkPassword = async () => {
       isLoggedIn.value = true;
       await refresh();
       passwordInput.value = '';
+
+      window.dispatchEvent(new Event('content-updated'));
     }
   } catch (err) {
     loginError.value = true;
