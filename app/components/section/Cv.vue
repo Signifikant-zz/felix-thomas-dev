@@ -41,7 +41,7 @@
             <span class="md:absolute md:-left-48 md:w-36 text-slate-300 text-sm font-mono md:text-right pt-0.5 whitespace-nowrap">12/2017 - 08/2018</span>
             <div>
               <h4 class="text-lg font-medium text-slate-250 italic">autodidaktische Weiterbildung & private Projekte</h4>
-              <p class="text-slate-400">Zend Framework 2, HTML5, CSS3, Javascript (Leipzig)</p>
+              <p class="text-slate-400">Zend Framework 2, HTML5, CSS3, Javascript</p>
             </div>
           </div>
 
@@ -96,7 +96,8 @@
             <span class="md:absolute md:-left-48 md:w-36 text-slate-100 text-sm font-mono font-bold md:text-right pt-0.5 whitespace-nowrap">10/2006 - 09/2010</span>
             <div>
               <h4 class="text-xl font-bold text-slate-100">Magister Artium</h4>
-              <p class="text-slate-300">Magister Studium der Philosophie (1. Hauptfach) und der Logik & Wissenschaftstheorie (2. Hauptfach)</p>
+              <p class="text-slate-300">Note: 2,2</p>
+              <p class="text-slate-400">Magister Studium der Philosophie (1. Hauptfach) und der Logik & Wissenschaftstheorie (2. Hauptfach)</p>
               <p class="text-slate-400">Universität Leipzig</p>
             </div>
           </div>

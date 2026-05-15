@@ -18,7 +18,7 @@
             Development
           </h4>
           <ul class="space-y-6 cursor-default">
-            <li v-for="item in ['HTML5', 'CSS3', 'JavaScript', 'Vue / Nuxt', 'Node.js / NPM']"
+            <li v-for="item in ['HTML5', 'CSS3', 'JavaScript', 'Vue', 'Node / npm', 'GitHub', 'XML / JSON']"
                 :key="item"
                 class="text-3xl md:text-4xl font-medium text-slate-100">
               {{ item }}
@@ -31,7 +31,7 @@
             Motion & Design
           </h4>
           <ul class="space-y-6 cursor-default">
-            <li v-for="item in ['GSAP 3', 'Canvas API', 'After Effects', 'Photoshop', 'Figma']"
+            <li v-for="item in ['GSAP 3', 'Canvas API', 'After Effects', 'Photoshop', 'Illustrator', 'Figma', 'Sketch']"
                 :key="item"
                 class="text-3xl md:text-4xl font-medium text-slate-100">
               {{ item }}
@@ -40,11 +40,11 @@
         </div>
 
         <div class="space-y-10">
-          <h4 class="text-blue-400 text-xs uppercase tracking-widest border-b border-blue-900/30 pb-4">
+          <h4 class="text-white text-xs uppercase tracking-widest border-b border-blue-900/30 pb-4 opacity-50">
             AdTech
           </h4>
           <ul class="space-y-6 cursor-default">
-            <li v-for="item in ['CM360', 'DCStudio', 'Flashtalking', 'Dynamic Content', 'GWD']"
+            <li v-for="item in ['CM360', 'DC Studio', 'Flashtalking', 'Dynamic Content', 'ClickTags', 'GWD', 'DOOH']"
                 :key="item"
                 class="text-3xl md:text-4xl font-medium text-slate-100">
               {{ item }}
@@ -52,16 +52,6 @@
           </ul>
         </div>
 
-      </div>
-
-      <div class="mt-24 pt-10 border-t border-slate-800/50 flex flex-wrap gap-x-10 gap-y-4 text-xs uppercase tracking-[0.2em] text-slate-500 cursor-default">
-        <span>WebStorm</span>
-        <span>Git</span>
-        <span>Illustrator</span>
-        <span>Media Encoder</span>
-        <span>Sketch</span>
-        <span>Markdown</span>
-        <span>XML / JSON</span>
       </div>
 
     </div>

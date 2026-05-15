@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-slate-900 text-white font-sans selection:bg-blue-500/30">
-    <nav class="fixed top-0 w-full z-[1000] bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+    <nav class="fixed top-0 w-full z-[1000] bg-[#1b202d] border-b border-slate-800">
       <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
 
         <div class="flex items-baseline text-xl md:text-2xl font-bold tracking-tighter">

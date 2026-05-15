@@ -1,5 +1,10 @@
 <template>
-  <section id="intro" ref="container" class="relative min-h-screen flex items-center bg-white overflow-hidden w-full">
+  <section
+      id="intro"
+      ref="container"
+      class="relative min-h-screen flex items-center bg-white overflow-hidden w-full"
+      style="touch-action: pan-y;"
+  >
 
     <canvas
         id="hero-canvas"
@@ -18,7 +23,7 @@
 <!--        </span>-->
 <!--      </div>-->
 
-      <h1 class="text-6xl md:text-8xl font-bold text-slate-900 mb-4 tracking-tighter leading-none">
+      <h1 class="text-4xl sm:text-6xl md:text-8xl font-bold text-slate-900 mb-4 tracking-tighter leading-none">
         FRONTEND <br />
         DEVELOPER<span class="text-blue-500">.</span><br />
         & CREATIVE <br />
@@ -28,9 +33,10 @@
 
     <div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 flex gap-6">
       <button v-for="(config, modeName) in modeConfigs" :key="modeName"
-              @click="switchMode(modeName)" class="group relative p-2 pointer-events-auto">
-        <span class="block w-3 h-3 rounded-full border-2 border-slate-900 transition-all duration-500"
-              :class="currentMode === modeName ? 'bg-slate-900 scale-125' : 'bg-transparent opacity-30 group-hover:opacity-100'">
+              @click="switchMode(modeName)"
+              class="group relative p-2 pointer-events-auto focus:outline-none">
+        <span class="block w-3 h-3 rounded-full border-2 border-blue-500 transition-all duration-500"
+              :class="currentMode === modeName ? 'bg-blue-500 scale-125' : 'bg-transparent opacity-30 group-hover:opacity-100'">
         </span>
       </button>
     </div>
@@ -166,6 +172,30 @@ const handleMouseUp = e => {
   }
 };
 
+const handleKeyDown = (e) => {
+  const keys = Object.keys(modeConfigs);
+  const currentIdx = keys.indexOf(currentMode.value);
+  if (e.key === "ArrowRight") {
+    switchMode(keys[(currentIdx + 1) % keys.length]);
+  } else if (e.key === "ArrowLeft") {
+    switchMode(keys[(currentIdx - 1 + keys.length) % keys.length]);
+  }
+};
+
+let touchStartX = 0;
+const handleTouchStart = (e) => { touchStartX = e.changedTouches[0].screenX; };
+const handleTouchEnd = (e) => {
+  const touchEndX = e.changedTouches[0].screenX;
+  const diff = touchStartX - touchEndX;
+  const keys = Object.keys(modeConfigs);
+  const currentIdx = keys.indexOf(currentMode.value);
+
+  if (Math.abs(diff) > 50) { // Threshold
+    if (diff > 0) switchMode(keys[(currentIdx + 1) % keys.length]); // Swipe Left -> Next
+    else switchMode(keys[(currentIdx - 1 + keys.length) % keys.length]); // Swipe Right -> Prev
+  }
+};
+
 const handleContextMenu = e => e.preventDefault();
 
 // Visibility & Intersection Logic
@@ -273,6 +303,11 @@ onMounted(() => {
   window.addEventListener('mousemove', handleMouseMove);
   window.addEventListener('mousedown', handleMouseDown);
   window.addEventListener('mouseup', handleMouseUp);
+  window.addEventListener('keydown', handleKeyDown);
+  if (container.value) {
+    container.value.addEventListener('touchstart', handleTouchStart, { passive: true });
+    container.value.addEventListener('touchend', handleTouchEnd, { passive: true });
+  }
   window.addEventListener('contextmenu', handleContextMenu);
   document.addEventListener("visibilitychange", handleVisibilityChange);
 
@@ -314,6 +349,12 @@ onUnmounted(() => {
   window.removeEventListener('mousemove', handleMouseMove);
   window.removeEventListener('mousedown', handleMouseDown);
   window.removeEventListener('mouseup', handleMouseUp);
+  window.removeEventListener('mouseup', handleMouseUp);
+  window.removeEventListener('keydown', handleKeyDown);
+  if (container.value) {
+    container.value.removeEventListener('touchstart', handleTouchStart);
+    container.value.removeEventListener('touchend', handleTouchEnd);
+  }
   window.removeEventListener('contextmenu', handleContextMenu);
   document.removeEventListener("visibilitychange", handleVisibilityChange);
   stopTicker();
