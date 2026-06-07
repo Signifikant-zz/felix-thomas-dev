@@ -1,8 +1,18 @@
 import { randomUUID } from 'node:crypto'
-import { serverSupabaseClient } from '#supabase/server'
+// import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseServiceRole } from '#supabase/server'
+
+// export default defineEventHandler(async (event) => {
+//   const client = await serverSupabaseClient(event)
+//   const body = await readBody(event)
+//
+//   if (!body.password) {
+//     throw createError({ statusCode: 400, statusMessage: 'Passwort fehlt' })
+//   }
 
 export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient(event)
+  // Nuxt holt sich den Schlüssel hierfür AUTOMATISCH aus der Vercel-Umgebung
+  const client = await serverSupabaseServiceRole(event)
   const body = await readBody(event)
 
   if (!body.password) {
