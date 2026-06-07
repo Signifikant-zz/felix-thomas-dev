@@ -28,6 +28,17 @@ export default defineEventHandler(async (event) => {
     user_agent: userAgent,
     ip_address: ip
   }])
+  const { error: updateError } = await client
+    .from('portfolio_logins')
+    .update({
+      last_login: new Date().toISOString(),
+      login_counter: (entry.login_counter || 0) + 1
+    })
+    .eq('id', entry.id)
+
+  if (updateError) {
+    console.error('Fehler beim Aktualisieren des Login-Counters:', updateError)
+  }
 
   const sessionId = randomUUID()
 
