@@ -67,7 +67,7 @@
             <div>
               <h4 class="text-xl font-bold text-white">
                 Fachinformatiker Anwendungsentwicklung (IHK)
-                <UiPdfButton class="inline-flex align-middle" pdf-path="/assets/cv-IHK-Felix-Thomas.pdf" @open="openPdf" />
+                <UiPdfButton class="inline-flex align-top" pdf-path="/assets/cv-IHK-Felix-Thomas.pdf" @open="openPdf" />
               </h4>
               <p class="text-slate-300">Note: 1,8 </p>
               <p class="text-slate-400">ciT Leipzig GmbH</p>
@@ -90,7 +90,7 @@
             <div>
               <h4 class="text-xl text-slate-150 font-bold">
                 Web Design & Development - SAE Diploma
-                <UiPdfButton class="inline-flex align-middle" pdf-path="/assets/cv-SAE-Felix-Thomas.pdf" @open="openPdf" />
+                <UiPdfButton class="inline-flex align-top" pdf-path="/assets/cv-SAE-Felix-Thomas.pdf" @open="openPdf" />
               </h4>
               <p class="text-slate-300">Note: 1,9</p>
               <p class="text-slate-400">SAE Leipzig</p>
@@ -103,7 +103,7 @@
             <div>
               <h4 class="text-xl font-bold text-slate-100">
                 Magister Artium
-                <UiPdfButton class="inline-flex align-middle" pdf-path="/assets/cv-Magister-Felix-Thomas.pdf" @open="openPdf" />
+                <UiPdfButton class="inline-flex align-top" pdf-path="/assets/cv-Magister-Felix-Thomas.pdf" @open="openPdf" />
               </h4>
               <p class="text-slate-300">Note: 2,2</p>
               <p class="text-slate-400">Magister Studium der Philosophie (1. Hauptfach) und der Logik & Wissenschaftstheorie (2. Hauptfach)</p>
