@@ -64,6 +64,10 @@ import { gsap }               from 'gsap'
 import { ScrollToPlugin }     from 'gsap/ScrollToPlugin'
 import { ScrollTrigger }      from 'gsap/ScrollTrigger'
 
+definePageMeta({
+  layout: 'default'
+})
+
 gsap.registerPlugin(ScrollToPlugin, ScrollTrigger)
 
 const navItems                = ['intro', 'expertise', 'development', 'showcase', 'cv']
