@@ -65,7 +65,10 @@
             <div class="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-blue-500"></div>
             <span class="md:absolute md:-left-48 md:w-36 text-slate-100 text-sm font-mono font-bold md:text-right pt-0.5 whitespace-nowrap">09/2016 - 08/2018</span>
             <div>
-              <h4 class="text-xl font-bold text-white">Fachinformatiker Anwendungsentwicklung (IHK)</h4>
+              <div class="flex items-center gap-3 flex-wrap">
+                <h4 class="text-xl font-bold text-white">Fachinformatiker Anwendungsentwicklung (IHK)</h4>
+                <UiPdfButton pdf-path="/assets/cv-IHK-Felix-Thomas.pdf" @open="openPdf" />
+              </div>
               <p class="text-slate-300">Note: 1,8 </p>
               <p class="text-slate-400">ciT Leipzig GmbH</p>
             </div>
@@ -85,7 +88,10 @@
             <div class="absolute -left-[8px] top-2 w-3.5 h-3.5 rounded-full bg-blue-500"></div>
             <span class="md:absolute md:-left-48 md:w-36 text-slate-100 text-sm font-mono font-bold md:text-right pt-0.5 whitespace-nowrap">09/2011 - 09/2012</span>
             <div>
-              <h4 class="text-xl font-bold text-slate-150 font-bold">Web Design & Development - SAE Diploma</h4>
+              <div class="flex items-center gap-3 flex-wrap">
+                <h4 class="text-xl font-bold text-slate-150 font-bold">Web Design & Development - SAE Diploma</h4>
+                <UiPdfButton pdf-path="/assets/cv-SAE-Feilx-Thomas.pdf" @open="openPdf" />
+              </div>
               <p class="text-slate-300">Note: 1,9</p>
               <p class="text-slate-400">SAE Leipzig</p>
             </div>
@@ -95,7 +101,10 @@
             <div class="absolute -left-[7px] top-2 w-3 h-3 rounded-full bg-blue-500"></div>
             <span class="md:absolute md:-left-48 md:w-36 text-slate-100 text-sm font-mono font-bold md:text-right pt-0.5 whitespace-nowrap">10/2006 - 09/2010</span>
             <div>
-              <h4 class="text-xl font-bold text-slate-100">Magister Artium</h4>
+              <div class="flex items-center gap-3 flex-wrap">
+                <h4 class="text-xl font-bold text-slate-100">Magister Artium</h4>
+                <UiPdfButton pdf-path="/assets/cv-Magister-Felix-Thomas.pdf" @open="openPdf" />
+              </div>
               <p class="text-slate-300">Note: 2,2</p>
               <p class="text-slate-400">Magister Studium der Philosophie (1. Hauptfach) und der Logik & Wissenschaftstheorie (2. Hauptfach)</p>
               <p class="text-slate-400">Universität Leipzig</p>
@@ -122,9 +131,39 @@
         </div>
       </div>
     </div>
+
+    <dialog ref="pdfDialog" class="w-[90vw] md:w-[80vw] h-[85vh] rounded-lg border-none p-0 bg-slate-900 shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-sm overflow-hidden">
+      <div class="relative w-full h-full flex flex-col pt-12">
+        <button
+            @click="closePdf"
+            class="absolute top-3 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition-colors text-xl font-bold"
+        >
+          &times;
+        </button>
+
+        <iframe
+            v-if="currentPdf"
+            :src="currentPdf"
+            class="w-full h-full border-none bg-white"
+        ></iframe>
+      </div>
+    </dialog>
   </section>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 
+const pdfDialog = ref(null)
+const currentPdf = ref(null)
+
+const openPdf = (pdfPath) => {
+  currentPdf.value = pdfPath
+  pdfDialog.value?.showModal()
+}
+
+const closePdf = () => {
+  pdfDialog.value?.close()
+  currentPdf.value = null
+}
 </script>
