@@ -2,7 +2,7 @@
   <section id="development" class="relative py-24 bg-slate-50 border-y border-slate-100 overflow-hidden">
     <div class="max-w-6xl mx-auto px-6 relative">
 
-      <div class="absolute left-1/3 top-1/2 lg:top-10 -translate-x-1/2 lg:-translate-x-1/3 -translate-y-1/3 pointer-events-none z-0 opacity-10
+      <div class="absolute left-1/3 top-1/4 xs:top-1/2 sm:top-1/2 md:top-1/2 lg:top-10 -translate-x-1/2 lg:-translate-x-1/3 -translate-y-1/3 pointer-events-none z-0 opacity-10
                   w-[70%] aspect-square max-w-[500px] lg:max-w-[350px]">
         <svg id="cardano-logo-wrap" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" class="w-full h-full fill-blue-600">
           <g id="cardano-logo">

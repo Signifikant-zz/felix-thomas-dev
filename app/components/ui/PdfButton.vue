@@ -1,7 +1,7 @@
 <template>
   <button
       @click="$emit('open', pdfPath)"
-      class="text-blue-500 hover:text-blue-400 transition-colors flex items-center justify-center p-1 inline-flex"
+      class="text-blue-500 hover:text-blue-400 transition-colors flex items-center justify-center p-1 ml-1"
       :title="title"
       type="button"
   >

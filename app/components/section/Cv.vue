@@ -65,10 +65,10 @@
             <div class="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-blue-500"></div>
             <span class="md:absolute md:-left-48 md:w-36 text-slate-100 text-sm font-mono font-bold md:text-right pt-0.5 whitespace-nowrap">09/2016 - 08/2018</span>
             <div>
-              <div class="flex items-center gap-3 flex-wrap">
-                <h4 class="text-xl font-bold text-white">Fachinformatiker Anwendungsentwicklung (IHK)</h4>
-                <UiPdfButton pdf-path="/assets/cv-IHK-Felix-Thomas.pdf" @open="openPdf" />
-              </div>
+              <h4 class="text-xl font-bold text-white">
+                Fachinformatiker Anwendungsentwicklung (IHK)
+                <UiPdfButton class="inline-flex align-middle" pdf-path="/assets/cv-IHK-Felix-Thomas.pdf" @open="openPdf" />
+              </h4>
               <p class="text-slate-300">Note: 1,8 </p>
               <p class="text-slate-400">ciT Leipzig GmbH</p>
             </div>
@@ -88,10 +88,10 @@
             <div class="absolute -left-[8px] top-2 w-3.5 h-3.5 rounded-full bg-blue-500"></div>
             <span class="md:absolute md:-left-48 md:w-36 text-slate-100 text-sm font-mono font-bold md:text-right pt-0.5 whitespace-nowrap">09/2011 - 09/2012</span>
             <div>
-              <div class="flex items-center gap-3 flex-wrap">
-                <h4 class="text-xl font-bold text-slate-150 font-bold">Web Design & Development - SAE Diploma</h4>
-                <UiPdfButton pdf-path="/assets/cv-SAE-Feilx-Thomas.pdf" @open="openPdf" />
-              </div>
+              <h4 class="text-xl text-slate-150 font-bold">
+                Web Design & Development - SAE Diploma
+                <UiPdfButton class="inline-flex align-middle" pdf-path="/assets/cv-SAE-Felix-Thomas.pdf" @open="openPdf" />
+              </h4>
               <p class="text-slate-300">Note: 1,9</p>
               <p class="text-slate-400">SAE Leipzig</p>
             </div>
@@ -101,10 +101,10 @@
             <div class="absolute -left-[7px] top-2 w-3 h-3 rounded-full bg-blue-500"></div>
             <span class="md:absolute md:-left-48 md:w-36 text-slate-100 text-sm font-mono font-bold md:text-right pt-0.5 whitespace-nowrap">10/2006 - 09/2010</span>
             <div>
-              <div class="flex items-center gap-3 flex-wrap">
-                <h4 class="text-xl font-bold text-slate-100">Magister Artium</h4>
-                <UiPdfButton pdf-path="/assets/cv-Magister-Felix-Thomas.pdf" @open="openPdf" />
-              </div>
+              <h4 class="text-xl font-bold text-slate-100">
+                Magister Artium
+                <UiPdfButton class="inline-flex align-middle" pdf-path="/assets/cv-Magister-Felix-Thomas.pdf" @open="openPdf" />
+              </h4>
               <p class="text-slate-300">Note: 2,2</p>
               <p class="text-slate-400">Magister Studium der Philosophie (1. Hauptfach) und der Logik & Wissenschaftstheorie (2. Hauptfach)</p>
               <p class="text-slate-400">Universität Leipzig</p>
