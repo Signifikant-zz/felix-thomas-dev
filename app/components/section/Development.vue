@@ -101,8 +101,8 @@ onMounted(() => {
       end: 'bottom top',
       scrub: 1,
     },
-    rotation: 60,
-    scale: 1.7,
+    rotation: 120,
+    scale: 2.4,
     transformOrigin: '50% 50%',
     ease: 'none'
   })

@@ -308,7 +308,7 @@ onMounted(() => {
     container.value.addEventListener('touchstart', handleTouchStart, { passive: true });
     container.value.addEventListener('touchend', handleTouchEnd, { passive: true });
   }
-  window.addEventListener('contextmenu', handleContextMenu);
+  container.value.addEventListener('contextmenu', handleContextMenu);
   document.addEventListener("visibilitychange", handleVisibilityChange);
 
   resize();
@@ -355,7 +355,7 @@ onUnmounted(() => {
     container.value.removeEventListener('touchstart', handleTouchStart);
     container.value.removeEventListener('touchend', handleTouchEnd);
   }
-  window.removeEventListener('contextmenu', handleContextMenu);
+  container.value.removeEventListener('contextmenu', handleContextMenu);
   document.removeEventListener("visibilitychange", handleVisibilityChange);
   stopTicker();
   particles = [];
