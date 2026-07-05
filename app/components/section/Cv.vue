@@ -13,7 +13,10 @@
             <div class="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-blue-500"></div>
             <span class="md:absolute md:-left-48 md:w-36 text-slate-200 text-[15px] font-mono font-bold md:text-right pt-0.5 whitespace-nowrap">03/2020 - 05/2026</span>
             <div>
-              <h4 class="text-xl font-bold text-white">Webentwickler & Programmierer (Senior Banner Developer)</h4>
+              <h4 class="text-xl font-bold text-white">
+                Webentwickler & Programmierer (Senior Banner Developer)
+                <UiPdfButton class="inline-flex align-top" pdf-path="/assets/cv-Arbeitszeugnis-tk-Felix-Thomas.pdf" @open="openPdf" />
+              </h4>
               <p class="text-slate-300">Tastenkunst GmbH, Leipzig</p>
             </div>
           </div>
