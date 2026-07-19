@@ -1,9 +1,8 @@
 name: Keep Database Alive
 on:
   schedule:
-    # Führt den Job jeden Tag um 04:00 Uhr UTC aus
     - cron: '0 4 * * *'
-  workflow_dispatch: # Ermöglicht manuelles Starten über den Actions-Tab
+  workflow_dispatch:
 
 jobs:
   ping:
@@ -11,6 +10,6 @@ jobs:
     steps:
       - name: Ping Supabase
         run: |
-          curl -f -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/" \
+          curl -v -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/" \
           -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
           -H "Authorization: Bearer ${{ secrets.SUPABASE_KEY }}"
